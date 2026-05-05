@@ -2,6 +2,7 @@ import { FaWhatsapp, FaPhone, FaHome, FaHandshake, FaChartLine, FaMapMarkerAlt }
 import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "../lib/supabase";
+import ContactForm from "../components/ContactForm";
 
 type Propiedad = {
   id: number;
@@ -173,15 +174,7 @@ export default async function Home() {
               <span className="text-orange-400 text-sm font-semibold tracking-widest uppercase mb-3 block">Contacto</span>
               <h2 className="text-3xl font-bold mb-2">¿Tenés alguna consulta?</h2>
               <p className="text-white/50 mb-8">Dejanos tus datos y te respondemos a la brevedad.</p>
-              <form className="grid gap-4">
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <input type="text" placeholder="Nombre" className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40" />
-                  <input type="tel" placeholder="Teléfono" className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40" />
-                </div>
-                <input type="email" placeholder="Email (opcional)" className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40" />
-                <textarea placeholder="¿En qué te podemos ayudar?" rows={4} className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40 resize-none" />
-                <button type="submit" className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-lg font-semibold transition">Enviar consulta</button>
-              </form>
+              <ContactForm />
             </div>
             <div className="flex flex-col justify-center gap-8">
               <div>
