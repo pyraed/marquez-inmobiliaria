@@ -140,7 +140,7 @@ export default async function Home() {
             <div className="flex justify-center">
               <div className="relative">
                
-                <img src="/matias.jpeg" alt="Matías Márquez" className="relative w-80 h-80 object-cover rounded-2xl shadow-xl" />
+                <img src="/Matias.jpeg" alt="Matías Márquez" className="relative w-80 h-80 object-cover rounded-2xl shadow-xl" />
               </div>
             </div>
             <div>
