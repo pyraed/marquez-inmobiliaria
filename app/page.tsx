@@ -142,15 +142,15 @@ export default async function Home() {
             <div className="flex justify-center">
               <div className="relative">
                
-                <img src="/Matias.jpeg" alt="Matías Márquez" className="relative w-80 h-80 object-cover rounded-2xl shadow-xl" />
+                <img src="/Matias.jpeg" alt="Matias Marquez" className="relative w-80 h-80 object-cover rounded-2xl shadow-xl" />
               </div>
             </div>
             <div>
               <span className="text-orange-400 text-sm font-semibold tracking-widest uppercase mb-3 block">Quién soy</span>
-              <h2 className="text-3xl font-bold mb-1">Matías Márquez</h2>
+              <h2 className="text-3xl font-bold mb-1">Matias Marquez</h2>
               <p className="text-white/50 text-sm mb-4 font-medium tracking-wide">Agente Inmobiliario · Fundador de MarQuez</p>
               <p className="text-white/80 leading-relaxed mb-4">
-                Soy Matías Márquez, agente inmobiliario y fundador de MarQuez Negocios Inmobiliarios.
+                Soy Matias Marquez, agente inmobiliario y fundador de MarQuez Negocios Inmobiliarios.
                 Me especializo en la compra, venta y asesoramiento de propiedades, acompañando a cada cliente en todo el proceso con un enfoque personalizado y transparente.
               </p>
               <p className="text-white/80 leading-relaxed mb-8">
