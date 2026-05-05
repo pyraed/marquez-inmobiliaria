@@ -1,5 +1,6 @@
 import { createClient } from "../../../lib/supabase";
 import PropiedadClient from "../../../components/PropiedadClient";
+import PropiedadContactForm from "../../../components/PropiedadContactForm";
 import { FaWhatsapp, FaPhone, FaMapMarkerAlt, FaRulerCombined, FaDoorOpen, FaBath, FaCar } from "react-icons/fa";
 import Link from "next/link";
 
@@ -133,31 +134,7 @@ export default async function PropiedadDetalle({
             <div className="flex-1 h-px bg-white/10" />
           </div>
 
-          <form className="grid gap-4">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <input
-                type="text"
-                placeholder="Tu nombre"
-                className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40"
-              />
-              <input
-                type="tel"
-                placeholder="Tu teléfono"
-                className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/40"
-              />
-            </div>
-            <textarea
-              rows={4}
-              defaultValue={`Hola Matías, me interesa la propiedad "${propiedad.titulo}" en ${propiedad.ubicacion}. Por favor contácteme.`}
-              className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition resize-none"
-            />
-            <button
-              type="submit"
-              className="bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-xl font-semibold transition w-full sm:w-auto sm:px-12"
-            >
-              Enviar consulta
-            </button>
-          </form>
+          <PropiedadContactForm titulo={propiedad.titulo} ubicacion={propiedad.ubicacion} />
         </div>
 
         {/* PROPIEDADES RELACIONADAS */}
