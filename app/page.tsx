@@ -12,6 +12,8 @@ type Propiedad = {
   imagenes: string[];
 };
 
+export const revalidate = 0;
+
 export default async function Home() {
   const supabase = createClient();
 
