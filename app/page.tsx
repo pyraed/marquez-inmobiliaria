@@ -58,7 +58,7 @@ export default async function Home() {
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://wa.me/5492210000000"
+                href="https://wa.me/5492983340336"
                 target="_blank"
                 className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-8 py-3 rounded-full text-lg font-semibold transition"
               >
@@ -189,25 +189,25 @@ export default async function Home() {
                 <p className="text-white/60 text-sm">Podés comunicarte directamente con Matías para asesoramiento personalizado.</p>
               </div>
               <div className="flex flex-col gap-4">
-                <a href="https://wa.me/5492210000000" target="_blank" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-xl transition w-fit">
+                <a href="https://wa.me/5492983340336" target="_blank" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-xl transition w-fit">
                   <FaWhatsapp className="text-orange-400" size={20} />
                   <div>
                     <p className="text-sm font-semibold">WhatsApp</p>
                     <p className="text-white/50 text-xs">Respuesta inmediata</p>
                   </div>
                 </a>
-                <a href="tel:+5492210000000" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-xl transition w-fit">
+                <a href="tel:+5492983340336" className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 px-5 py-3 rounded-xl transition w-fit">
                   <FaPhone className="text-orange-400" size={18} />
                   <div>
-                    <p className="text-sm font-semibold">+54 9 221 000 0000</p>
+                    <p className="text-sm font-semibold">+5492983340336</p>
                     <p className="text-white/50 text-xs">Lun a Sáb de 9 a 18hs</p>
                   </div>
                 </a>
                 <div className="flex items-center gap-3 px-5 py-3">
                   <span className="text-orange-400">📍</span>
                   <div>
-                    <p className="text-sm font-semibold">Buenos Aires, Argentina</p>
-                    <p className="text-white/50 text-xs">Zona sur y alrededores</p>
+                    <p className="text-sm font-semibold">Adolfo Gonzalez Chaves, Buenos Aires, Argentina</p>
+                    <p className="text-white/50 text-xs">Adolfo Gonzalez Chaves y alrededores</p>
                   </div>
                 </div>
               </div>
@@ -248,10 +248,10 @@ export default async function Home() {
           <div>
             <h4 className="font-semibold mb-4">Contacto</h4>
             <ul className="space-y-3 text-white/60 text-sm">
-              <li><a href="tel:+5492210000000" className="hover:text-orange-400 transition">📞 +54 9 221 000 0000</a></li>
-              <li>📍 Buenos Aires, Argentina</li>
+              <li><a href="tel:+5492983340336" className="hover:text-orange-400 transition">📞 +5492983340336</a></li>
+              <li>📍 Adolfo Gonzalez Chaves, Buenos Aires, Argentina</li>
               <li>
-                <a href="https://wa.me/5492210000000" target="_blank" className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition">
+                <a href="https://wa.me/5492983340336" target="_blank" className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 transition">
                   <FaWhatsapp />
                   WhatsApp
                 </a>

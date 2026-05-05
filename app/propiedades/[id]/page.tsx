@@ -111,7 +111,7 @@ export default async function PropiedadDetalle({
 
           <div className="flex flex-col sm:flex-row gap-4 mb-10">
             <a
-              href={`https://wa.me/5492210000000?text=${mensajeWhatsapp}`}
+              href={`https://wa.me/5492983340336?text=${mensajeWhatsapp}`}
               target="_blank"
               className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-6 py-3 rounded-xl font-semibold transition"
             >
@@ -119,7 +119,7 @@ export default async function PropiedadDetalle({
               Consultar por WhatsApp
             </a>
             <a
-              href="tel:+5492210000000"
+              href="tel:+5492983340336"
               className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-6 py-3 rounded-xl font-semibold transition"
             >
               <FaPhone size={16} />

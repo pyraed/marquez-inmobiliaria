@@ -92,7 +92,7 @@ export default function Navbar() {
         {/* CTA + HAMBURGUESA */}
         <div className="flex items-center gap-4">
           <a
-            href="https://wa.me/5492210000000"
+            href="https://wa.me/5492983340336"
             target="_blank"
             className="hidden sm:flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition"
           >
@@ -136,7 +136,7 @@ export default function Navbar() {
             </Link>
           )}
           <a
-            href="https://wa.me/5492210000000"
+            href="https://wa.me/5492983340336"
             target="_blank"
             className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition w-fit"
           >
