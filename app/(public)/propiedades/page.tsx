@@ -27,9 +27,18 @@ interface Props {
   searchParams: Promise<SearchParams>;
 }
 
+// Función de timing compatible con Server Components (no usa performance.now)
+function now() { return Date.now(); }
+
 export default async function PropiedadesPage({ searchParams }: Props) {
+  const T0 = now();
+  console.log(`[PROP] START ${new Date().toISOString()}`);
+
   const params = await searchParams;
+  console.log(`[PROP] searchParams: ${now() - T0}ms`);
+
   const supabase = createPublicClient();
+  console.log(`[PROP] client created: ${now() - T0}ms`);
 
   let query = supabase
     .from("propiedades")
@@ -58,6 +67,9 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     query = query.order("created_at", { ascending: false });
   }
 
+  const T_QUERIES = now();
+  console.log(`[PROP] queries start: ${T_QUERIES - T0}ms`);
+
   const [propiedadesResult, localidadesResult] = await Promise.all([
     query,
     supabase
@@ -67,6 +79,9 @@ export default async function PropiedadesPage({ searchParams }: Props) {
       .order("localidad"),
   ]);
 
+  const T_DONE = now();
+  console.log(`[PROP] queries done: total=${T_DONE - T0}ms | queries=${T_DONE - T_QUERIES}ms | propErr=${propiedadesResult.error?.message ?? "ok"} | locErr=${localidadesResult.error?.message ?? "ok"} | propRows=${propiedadesResult.data?.length ?? 0}`);
+
   const propiedades = (propiedadesResult.data as unknown as PropiedadCardType[]) || [];
   const localidades = [
     ...new Set(
@@ -75,6 +90,8 @@ export default async function PropiedadesPage({ searchParams }: Props) {
         .filter(Boolean)
     ),
   ];
+
+  console.log(`[PROP] render start: ${now() - T0}ms`);
 
   return (
     <main className="bg-[#0B1F3A] text-white pt-24 min-h-screen">
