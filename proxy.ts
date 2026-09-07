@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -27,14 +27,14 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Si intenta entrar al admin sin estar logueado, redirigir al login
-  if (request.nextUrl.pathname.startsWith("/admin") &&
-      !request.nextUrl.pathname.startsWith("/admin/login") &&
-      !user) {
+  if (
+    request.nextUrl.pathname.startsWith("/admin") &&
+    !request.nextUrl.pathname.startsWith("/admin/login") &&
+    !user
+  ) {
     return NextResponse.redirect(new URL("/admin/login", request.url));
   }
 
-  // Si ya está logueado e intenta ir al login, redirigir al admin
   if (request.nextUrl.pathname.startsWith("/admin/login") && user) {
     return NextResponse.redirect(new URL("/admin", request.url));
   }
