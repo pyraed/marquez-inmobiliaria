@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "../../../lib/supabase-browser";
 import { FaLock, FaEnvelope } from "react-icons/fa";
 
@@ -34,14 +35,19 @@ export default function LoginPage() {
     <main className="min-h-screen bg-[#0B1F3A] flex items-center justify-center px-6">
       <div className="w-full max-w-md">
 
-        <div className="text-center mb-10">
-          <span className="text-orange-500 text-5xl">⌂</span>
-          <h1 className="text-white text-2xl font-bold mt-2">MarQuez</h1>
-          <p className="text-white/50 text-sm mt-1">Panel de administración</p>
+        <div className="flex justify-center mb-10">
+          <Image
+            src="/logo-marquez.png"
+            alt="MarQuez Negocios Inmobiliarios"
+            width={240}
+            height={120}
+            className="h-20 w-auto object-contain"
+            priority
+          />
         </div>
 
         <div className="bg-[#102A4C] rounded-2xl p-8 border border-white/10 shadow-xl">
-          <h2 className="text-white text-xl font-semibold mb-6">Iniciar sesión</h2>
+          <h2 className="text-white text-xl font-semibold mb-6">Panel de administración</h2>
 
           <form onSubmit={handleLogin} className="grid gap-4" noValidate>
             <div>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
@@ -32,14 +33,11 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Cierra el menú al cambiar de ruta
-  const prevPathname = typeof window !== 'undefined' ? pathname : null;
   useEffect(() => {
-    if (prevPathname !== null) setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (menuAbierto) setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Cierra el menú al hacer click fuera
   useEffect(() => {
     if (!menuAbierto) return;
     const handler = (e: MouseEvent) => {
@@ -74,20 +72,18 @@ export default function Navbar() {
             : "bg-[#0B1F3A]/80 backdrop-blur-sm border-white/5"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
 
           {/* LOGO */}
-          <Link
-            href="/"
-            className="text-xl font-bold tracking-wide flex items-center gap-2 select-none"
-          >
-            <span className="text-orange-500 text-2xl">⌂</span>
-            <span>
-              MarQuez
-              <span className="block text-xs tracking-widest text-gray-300">
-                NEGOCIOS INMOBILIARIOS
-              </span>
-            </span>
+          <Link href="/" className="flex items-center select-none shrink-0">
+            <Image
+              src="/logo-marquez.png"
+              alt="MarQuez Negocios Inmobiliarios"
+              width={180}
+              height={90}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </Link>
 
           {/* NAV DESKTOP */}

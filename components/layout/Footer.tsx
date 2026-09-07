@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { FaWhatsapp, FaInstagram, FaFacebook } from "react-icons/fa";
 import {
   NOMBRE_INMOBILIARIA,
@@ -20,15 +21,15 @@ export default function Footer() {
 
         {/* BRAND */}
         <div>
-          <div className="text-xl font-bold tracking-wide flex items-center gap-2 mb-4">
-            <span className="text-orange-500 text-2xl">⌂</span>
-            <span>
-              MarQuez
-              <span className="block text-xs tracking-widest text-gray-400">
-                NEGOCIOS INMOBILIARIOS
-              </span>
-            </span>
-          </div>
+          <Link href="/" className="inline-block mb-5">
+            <Image
+              src="/logo-marquez.png"
+              alt="MarQuez Negocios Inmobiliarios"
+              width={200}
+              height={100}
+              className="h-14 w-auto object-contain"
+            />
+          </Link>
           <p className="text-white/50 text-sm leading-relaxed mb-5">
             Asesoramiento inmobiliario personalizado en compra, venta y alquiler
             de propiedades en {UBICACION_DISPLAY}.
@@ -67,36 +68,20 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-5 text-white/90">Navegación</h4>
           <ul className="space-y-3 text-white/60 text-sm">
-            <li>
-              <Link href="/" className="hover:text-orange-400 transition">
-                Inicio
-              </Link>
-            </li>
-            <li>
-              <Link href="/propiedades" className="hover:text-orange-400 transition">
-                Propiedades
-              </Link>
-            </li>
-            <li>
-              <Link href="/propiedades?operacion=Venta" className="hover:text-orange-400 transition">
-                Propiedades en venta
-              </Link>
-            </li>
-            <li>
-              <Link href="/propiedades?operacion=Alquiler" className="hover:text-orange-400 transition">
-                Propiedades en alquiler
-              </Link>
-            </li>
-            <li>
-              <Link href="/tasaciones" className="hover:text-orange-400 transition">
-                Tasaciones
-              </Link>
-            </li>
-            <li>
-              <Link href="/contacto" className="hover:text-orange-400 transition">
-                Contacto
-              </Link>
-            </li>
+            {[
+              { href: "/", label: "Inicio" },
+              { href: "/propiedades", label: "Propiedades" },
+              { href: "/propiedades?operacion=Venta", label: "Propiedades en venta" },
+              { href: "/propiedades?operacion=Alquiler", label: "Propiedades en alquiler" },
+              { href: "/tasaciones", label: "Tasaciones" },
+              { href: "/contacto", label: "Contacto" },
+            ].map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="hover:text-orange-400 transition">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
           </ul>
         </div>
 

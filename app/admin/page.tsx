@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "../../lib/supabase-browser";
 import {
   FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaTimes,
@@ -311,11 +312,13 @@ export default function AdminPage() {
       {/* HEADER */}
       <header className="bg-[#102A4C] border-b border-white/10 px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
-          <span className="text-orange-500 text-2xl">⌂</span>
-          <div>
-            <h1 className="font-bold text-lg leading-none">MarQuez</h1>
-            <p className="text-white/50 text-xs">Panel de administración</p>
-          </div>
+          <Image
+            src="/logo-marquez.png"
+            alt="MarQuez Negocios Inmobiliarios"
+            width={140}
+            height={70}
+            className="h-9 w-auto object-contain"
+          />
         </div>
         <button
           onClick={cerrarSesion}
