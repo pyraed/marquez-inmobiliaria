@@ -1,10 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
-import Navbar from "../components/Navbar";
-import Footer from "../components/layout/Footer";
-import WhatsAppFloat from "../components/ui/WhatsAppFloat";
-import { headers } from "next/headers";
 import {
   NOMBRE_INMOBILIARIA,
   SEO_DESCRIPTION_DEFAULT,
@@ -90,15 +86,14 @@ const schemaOrg = {
   },
 };
 
-export default async function RootLayout({
+// Root layout — completamente estático, sin await, sin headers(), sin cookies().
+// Navbar/Footer están en app/(public)/layout.tsx (rutas públicas).
+// Las rutas /admin tienen su propio layout sin Navbar/Footer.
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const headersList = await headers();
-  const pathname = headersList.get("x-invoke-path") || "";
-  const esAdmin = pathname.startsWith("/admin");
-
   return (
     <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
       <head>
@@ -108,12 +103,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col bg-[#0B1F3A] text-white">
-        {!esAdmin && <Navbar />}
-        <div className="flex-1 flex flex-col">
-          {children}
-        </div>
-        {!esAdmin && <Footer />}
-        {!esAdmin && <WhatsAppFloat />}
+        {children}
       </body>
     </html>
   );
