@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FaWhatsapp, FaPhone, FaHome, FaHandshake, FaChartLine, FaMapMarkerAlt, FaArrowRight } from "react-icons/fa";
-import { createClient } from "../../lib/supabase-server";
+import { createPublicClient } from "../../lib/supabase-public";
 import ContactForm from "../../components/ContactForm";
 import ScrollReveal from "../../components/ScrollReveal";
 import PropiedadCard from "../../components/propiedades/PropiedadCard";
@@ -14,7 +14,7 @@ import type { PropiedadCard as PropiedadCardType } from "../../types/propiedad";
 export const revalidate = 60;
 
 export default async function Home() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Propiedades destacadas (marcadas como destacada=true) o las más recientes
   const { data: destacadasData } = await supabase

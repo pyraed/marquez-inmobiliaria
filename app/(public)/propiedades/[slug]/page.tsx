@@ -1,4 +1,4 @@
-import { createClient } from "../../../../lib/supabase-server";
+import { createPublicClient } from "../../../../lib/supabase-public";
 import Galeria from "../../../../components/Galeria";
 import PropiedadContactForm from "../../../../components/PropiedadContactForm";
 import ShareButton from "../../../../components/ui/ShareButton";
@@ -21,7 +21,7 @@ interface Props {
 }
 
 async function getPropiedad(slug: string): Promise<Propiedad | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data } = await supabase
     .from("propiedades")
     .select("*")
@@ -73,7 +73,7 @@ export default async function PropiedadDetallePage({ params }: Props) {
 
   if (!propiedad) notFound();
 
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data: relacionadasData } = await supabase
     .from("propiedades")
     .select("id, slug, titulo, operacion, tipo, precio_display, ubicacion, localidad, imagenes, dormitorios, banos, superficie_m2, ambientes")

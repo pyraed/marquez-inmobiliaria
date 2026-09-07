@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { createClient } from "../../../lib/supabase-server";
+import { createPublicClient } from "../../../lib/supabase-public";
 import PropiedadCard from "../../../components/propiedades/PropiedadCard";
 import FiltrosPropiedades from "../../../components/propiedades/FiltrosPropiedades";
 import type { Metadata } from "next";
@@ -29,9 +29,8 @@ interface Props {
 
 export default async function PropiedadesPage({ searchParams }: Props) {
   const params = await searchParams;
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
-  // Construir query principal con filtros
   let query = supabase
     .from("propiedades")
     .select("id, slug, titulo, operacion, tipo, precio_display, precio_valor, ubicacion, localidad, imagenes, dormitorios, banos, superficie_m2, ambientes")
@@ -40,7 +39,6 @@ export default async function PropiedadesPage({ searchParams }: Props) {
   if (params.operacion) query = query.eq("operacion", params.operacion);
   if (params.tipo) query = query.eq("tipo", params.tipo);
   if (params.localidad) query = query.eq("localidad", params.localidad);
-
   if (params.precioMin) {
     const min = Number(params.precioMin);
     if (!isNaN(min)) query = query.gte("precio_valor", min);
@@ -49,11 +47,9 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     const max = Number(params.precioMax);
     if (!isNaN(max)) query = query.lte("precio_valor", max);
   }
-
   if (params.q) {
     query = query.or(`titulo.ilike.%${params.q}%,ubicacion.ilike.%${params.q}%,localidad.ilike.%${params.q}%`);
   }
-
   if (params.orden === "precio_asc") {
     query = query.order("precio_valor", { ascending: true, nullsFirst: false });
   } else if (params.orden === "precio_desc") {
@@ -62,7 +58,6 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     query = query.order("created_at", { ascending: false });
   }
 
-  // PARALELO: las dos queries corren al mismo tiempo en lugar de secuencial
   const [propiedadesResult, localidadesResult] = await Promise.all([
     query,
     supabase
@@ -85,7 +80,6 @@ export default async function PropiedadesPage({ searchParams }: Props) {
     <main className="bg-[#0B1F3A] text-white pt-24 min-h-screen">
       <div className="max-w-6xl mx-auto px-6 py-10">
 
-        {/* ENCABEZADO */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">Propiedades</h1>
           <p className="text-white/50 mt-1 text-sm">
@@ -93,22 +87,16 @@ export default async function PropiedadesPage({ searchParams }: Props) {
           </p>
         </div>
 
-        {/* FILTROS */}
         <div className="mb-8">
           <Suspense>
             <FiltrosPropiedades localidades={localidades} total={propiedades.length} />
           </Suspense>
         </div>
 
-        {/* GRID */}
         {propiedades.length > 0 ? (
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {propiedades.map((prop, i) => (
-              <PropiedadCard
-                key={prop.id}
-                propiedad={prop}
-                prioridad={i < 3}
-              />
+              <PropiedadCard key={prop.id} propiedad={prop} prioridad={i < 3} />
             ))}
           </div>
         ) : (
