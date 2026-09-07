@@ -7,12 +7,16 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { WHATSAPP_URL } from "../lib/config";
 
+// href absolutos — siempre empiezan con '/' para evitar concatenación de paths.
+// Links con hash usan scroll={false} para que Next.js no haga un push adicional
+// al intentar gestionar el scroll, lo que causaba URLs como /#servicios#servicios.
+// Contacto apunta a la página /contacto (no a /#contacto, que era incorrecto).
 const links = [
-  { href: "/", label: "Inicio" },
-  { href: "/propiedades", label: "Propiedades" },
-  { href: "/#servicios", label: "Servicios" },
-  { href: "/tasaciones", label: "Tasaciones" },
-  { href: "/#contacto", label: "Contacto" },
+  { href: "/",            label: "Inicio",      hash: false },
+  { href: "/propiedades", label: "Propiedades",  hash: false },
+  { href: "/#servicios",  label: "Servicios",    hash: true  },
+  { href: "/tasaciones",  label: "Tasaciones",   hash: false },
+  { href: "/contacto",    label: "Contacto",     hash: false },
 ];
 
 export default function Navbar() {
@@ -33,11 +37,13 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Cierra el menú al cambiar de ruta
   useEffect(() => {
     if (menuAbierto) setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  // Cierra el menú al hacer click fuera del header
   useEffect(() => {
     if (!menuAbierto) return;
     const handler = (e: MouseEvent) => {
@@ -49,8 +55,9 @@ export default function Navbar() {
   }, [menuAbierto]);
 
   const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href.split("#")[0]) && href.split("#")[0] !== "/";
+    const path = href.split("#")[0];
+    if (path === "/") return pathname === "/";
+    return pathname.startsWith(path) && path !== "/";
   };
 
   return (
@@ -74,9 +81,7 @@ export default function Navbar() {
       >
         <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center gap-6">
 
-          {/* LOGO — el PNG recortado mide 780x350, proporción 2.23:1
-              En desktop: altura fija 64px → ancho automático ~143px de contenido visible
-              En mobile: altura 52px */}
+          {/* LOGO */}
           <Link href="/" className="shrink-0 flex items-center">
             <Image
               src="/logo-marquez.png"
@@ -94,6 +99,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                scroll={!link.hash}
                 className={`transition-all duration-200 font-medium relative group whitespace-nowrap ${
                   isActive(link.href)
                     ? "text-orange-400"
@@ -145,6 +151,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                scroll={!link.hash}
                 className={`text-sm font-medium transition py-1 ${
                   isActive(link.href) ? "text-orange-400" : "text-white/80 hover:text-orange-400"
                 }`}

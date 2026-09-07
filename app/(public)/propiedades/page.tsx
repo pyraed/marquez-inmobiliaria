@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: `Explorá todas las propiedades en venta y alquiler de ${NOMBRE_INMOBILIARIA}. Casas, departamentos, terrenos, campos y más.`,
 };
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface SearchParams {
   operacion?: string;
