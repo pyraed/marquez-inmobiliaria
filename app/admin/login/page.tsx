@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "../../../lib/supabase";
+import { createClient } from "../../../lib/supabase-browser";
 import { FaLock, FaEnvelope } from "react-icons/fa";
 
 export default function LoginPage() {
@@ -34,40 +34,50 @@ export default function LoginPage() {
     <main className="min-h-screen bg-[#0B1F3A] flex items-center justify-center px-6">
       <div className="w-full max-w-md">
 
-        {/* Logo */}
         <div className="text-center mb-10">
           <span className="text-orange-500 text-5xl">⌂</span>
           <h1 className="text-white text-2xl font-bold mt-2">MarQuez</h1>
           <p className="text-white/50 text-sm mt-1">Panel de administración</p>
         </div>
 
-        {/* Card */}
         <div className="bg-[#102A4C] rounded-2xl p-8 border border-white/10 shadow-xl">
           <h2 className="text-white text-xl font-semibold mb-6">Iniciar sesión</h2>
 
-          <form onSubmit={handleLogin} className="grid gap-4">
-            <div className="relative">
-              <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={14} />
-              <input
-                type="email"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white outline-none focus:border-orange-500 transition placeholder:text-white/40"
-              />
+          <form onSubmit={handleLogin} className="grid gap-4" noValidate>
+            <div>
+              <label htmlFor="email" className="block text-sm text-white/60 mb-1.5">
+                Email
+              </label>
+              <div className="relative">
+                <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={14} />
+                <input
+                  id="email"
+                  type="email"
+                  placeholder="tu@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                />
+              </div>
             </div>
 
-            <div className="relative">
-              <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={14} />
-              <input
-                type="password"
-                placeholder="Contraseña"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white outline-none focus:border-orange-500 transition placeholder:text-white/40"
-              />
+            <div>
+              <label htmlFor="password" className="block text-sm text-white/60 mb-1.5">
+                Contraseña
+              </label>
+              <div className="relative">
+                <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/30" size={14} />
+                <input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-10 pr-4 py-3 rounded-lg bg-white/10 border border-white/20 text-white outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                />
+              </div>
             </div>
 
             {error && (

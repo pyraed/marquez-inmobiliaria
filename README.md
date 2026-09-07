@@ -1,36 +1,158 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# MarQuez Negocios Inmobiliarios
 
-## Getting Started
+Web inmobiliaria profesional construida con Next.js 16, Supabase y Tailwind CSS.
 
-First, run the development server:
+---
+
+## Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Base de datos:** Supabase (PostgreSQL)
+- **Auth:** Supabase Auth
+- **Storage:** Supabase Storage
+- **Estilos:** Tailwind CSS v4
+- **Lenguaje:** TypeScript
+
+---
+
+## Instalación
+
+### 1. Instalar dependencias
+
+```bash
+npm install
+```
+
+### 2. Configurar variables de entorno
+
+```bash
+cp .env.example .env.local
+```
+
+Completar `.env.local` con las credenciales del proyecto Supabase:
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://tu-project-ref.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=tu-anon-key
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
+
+### 3. Inicializar la base de datos
+
+En el SQL Editor de Supabase, ejecutar el archivo:
+
+```
+supabase/schema.sql
+```
+
+Este archivo crea:
+- Tabla `propiedades` con todos los campos
+- Índices
+- Trigger `updated_at`
+- Políticas RLS
+
+### 4. Crear usuario administrador
+
+En Supabase → Authentication → Users → Add user:
+- Email: el email del administrador
+- Password: contraseña segura
+
+### 5. Ejecutar en desarrollo
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Abrir [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 6. Panel de administración
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Acceder a `/admin/login` con las credenciales creadas en el paso 4.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Configuración adicional
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Redes sociales
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Editar `lib/config.ts` y completar:
 
-## Deploy on Vercel
+```ts
+export const INSTAGRAM_URL = "https://instagram.com/tu-usuario";
+export const FACEBOOK_URL = "https://facebook.com/tu-usuario";
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Dominio en producción
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Actualizar en `lib/config.ts`:
+
+```ts
+export const SITE_URL = "https://tudominio.com.ar";
+```
+
+Y también la variable de entorno `NEXT_PUBLIC_SITE_URL`.
+
+### Imagen OG
+
+Reemplazar `public/og-default.svg` con una imagen real de 1200×630px
+(puede ser JPG o PNG) para el preview en redes sociales.
+
+---
+
+## Estructura del proyecto
+
+```
+app/
+├── layout.tsx              # Layout global + metadata + Schema.org
+├── page.tsx                # Home
+├── not-found.tsx           # Página 404
+├── robots.ts               # robots.txt dinámico
+├── sitemap.ts              # Sitemap dinámico
+├── propiedades/
+│   ├── page.tsx            # Listado con filtros (Server Component)
+│   └── [slug]/page.tsx     # Ficha de propiedad + metadata
+├── contacto/page.tsx       # Página de contacto
+├── tasaciones/page.tsx     # Página para propietarios
+└── admin/
+    ├── page.tsx            # Panel de administración
+    └── login/page.tsx      # Login
+
+components/
+├── layout/Footer.tsx
+├── propiedades/
+│   ├── PropiedadCard.tsx
+│   └── FiltrosPropiedades.tsx
+├── ui/
+│   ├── WhatsAppFloat.tsx
+│   └── ShareButton.tsx
+├── Navbar.tsx
+├── Galeria.tsx
+├── ContactForm.tsx
+└── ScrollReveal.tsx
+
+lib/
+├── config.ts               # Constantes globales (WA, tel, redes, etc.)
+├── supabase-server.ts      # Cliente Supabase para Server Components
+└── supabase-browser.ts     # Cliente Supabase para Client Components
+
+types/propiedad.ts          # Tipos TypeScript del esquema
+utils/propiedades.ts        # buildSlug, formatPrecio, parseNumericField
+supabase/schema.sql         # SQL completo para inicializar la DB
+```
+
+---
+
+## Build para producción
+
+```bash
+npm run build
+npm start
+```
+
+---
+
+## Deploy
+
+Compatible con Vercel, Railway, o cualquier plataforma que soporte Node.js.
+
+Asegurarse de configurar las variables de entorno en la plataforma de deploy.

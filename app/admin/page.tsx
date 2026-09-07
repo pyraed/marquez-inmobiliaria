@@ -2,35 +2,41 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "../../lib/supabase";
-import { FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaTimes, FaSave, FaUpload, FaImage } from "react-icons/fa";
+import { createClient } from "../../lib/supabase-browser";
+import {
+  FaPlus, FaEdit, FaTrash, FaSignOutAlt, FaTimes,
+  FaSave, FaUpload, FaImage, FaChevronDown, FaChevronUp,
+} from "react-icons/fa";
+import {
+  Propiedad, PropiedadForm,
+  OPERACIONES, TIPOS_PROPIEDAD, ESTADOS_PROPIEDAD, MONEDAS,
+} from "../../types/propiedad";
+import { buildSlug, formatPrecio, parseNumericField } from "../../utils/propiedades";
 
-type Propiedad = {
-  id?: number;
-  titulo: string;
-  tipo: "Venta" | "Alquiler";
-  precio: string;
-  ubicacion: string;
-  descripcion: string;
-  imagenes: string[];
-  superficie?: string;
-  ambientes?: number | string;
-  banos?: number | string;
-  garage?: boolean;
-};
-
-const propiedadVacia: Propiedad = {
+const FORM_VACIO: PropiedadForm = {
   titulo: "",
-  tipo: "Venta",
-  precio: "",
+  operacion: "Venta",
+  tipo: "Casa",
+  precio_valor: "",
+  moneda: "USD",
+  precio_display: "",
   ubicacion: "",
+  localidad: "",
   descripcion: "",
   imagenes: [],
-  superficie: "",
+  superficie_m2: "",
+  superficie_ha: "",
   ambientes: "",
+  dormitorios: "",
   banos: "",
   garage: false,
+  destacada: false,
+  estado: "publicada",
+  seo_titulo: "",
+  seo_descripcion: "",
 };
+
+const MAX_FOTO_MB = 10;
 
 export default function AdminPage() {
   const router = useRouter();
@@ -40,13 +46,14 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [modalAbierto, setModalAbierto] = useState(false);
   const [editando, setEditando] = useState<Propiedad | null>(null);
-  const [form, setForm] = useState<Propiedad>(propiedadVacia);
+  const [form, setForm] = useState<PropiedadForm>(FORM_VACIO);
   const [guardando, setGuardando] = useState(false);
   const [eliminandoId, setEliminandoId] = useState<number | null>(null);
   const [confirmarEliminar, setConfirmarEliminar] = useState<number | null>(null);
   const [mensaje, setMensaje] = useState<{ texto: string; tipo: "ok" | "error" } | null>(null);
   const [subiendoFotos, setSubiendoFotos] = useState(false);
   const [fotosPreview, setFotosPreview] = useState<string[]>([]);
+  const [seoAbierto, setSeoAbierto] = useState(false);
 
   const cargarPropiedades = async () => {
     setLoading(true);
@@ -54,12 +61,14 @@ export default function AdminPage() {
       .from("propiedades")
       .select("*")
       .order("created_at", { ascending: false });
-    if (!error && data) setPropiedades(data);
+    if (!error && data) setPropiedades(data as Propiedad[]);
     setLoading(false);
   };
 
   useEffect(() => {
-    cargarPropiedades();
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void cargarPropiedades();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const mostrarMensaje = (texto: string, tipo: "ok" | "error") => {
@@ -69,23 +78,60 @@ export default function AdminPage() {
 
   const abrirNueva = () => {
     setEditando(null);
-    setForm(propiedadVacia);
+    setForm(FORM_VACIO);
     setFotosPreview([]);
+    setSeoAbierto(false);
     setModalAbierto(true);
   };
 
   const abrirEditar = (prop: Propiedad) => {
     setEditando(prop);
-    setForm(prop);
+    setForm({
+      titulo: prop.titulo,
+      operacion: prop.operacion,
+      tipo: prop.tipo,
+      precio_valor: prop.precio_valor?.toString() ?? "",
+      moneda: prop.moneda,
+      precio_display: prop.precio_display,
+      ubicacion: prop.ubicacion,
+      localidad: prop.localidad,
+      descripcion: prop.descripcion,
+      imagenes: prop.imagenes,
+      superficie_m2: prop.superficie_m2?.toString() ?? "",
+      superficie_ha: prop.superficie_ha?.toString() ?? "",
+      ambientes: prop.ambientes?.toString() ?? "",
+      dormitorios: prop.dormitorios?.toString() ?? "",
+      banos: prop.banos?.toString() ?? "",
+      garage: prop.garage,
+      destacada: prop.destacada,
+      estado: prop.estado,
+      seo_titulo: prop.seo_titulo ?? "",
+      seo_descripcion: prop.seo_descripcion ?? "",
+    });
     setFotosPreview(prop.imagenes || []);
+    setSeoAbierto(false);
     setModalAbierto(true);
   };
 
   const cerrarModal = () => {
     setModalAbierto(false);
     setEditando(null);
-    setForm(propiedadVacia);
+    setForm(FORM_VACIO);
     setFotosPreview([]);
+    setSeoAbierto(false);
+  };
+
+  // Autogenera precio_display cuando cambia precio_valor o moneda
+  const handlePrecioValor = (valor: string) => {
+    const num = parseNumericField(valor);
+    const display = num ? formatPrecio(num, form.moneda) : "";
+    setForm((prev) => ({ ...prev, precio_valor: valor, precio_display: display }));
+  };
+
+  const handleMoneda = (moneda: "USD" | "ARS") => {
+    const num = parseNumericField(form.precio_valor);
+    const display = num ? formatPrecio(num, moneda) : form.precio_display;
+    setForm((prev) => ({ ...prev, moneda, precio_display: display }));
   };
 
   const subirFotos = async (archivos: FileList) => {
@@ -93,6 +139,12 @@ export default function AdminPage() {
     const urlsNuevas: string[] = [];
 
     for (const archivo of Array.from(archivos)) {
+      // Validar tamaño máximo
+      if (archivo.size > MAX_FOTO_MB * 1024 * 1024) {
+        mostrarMensaje(`"${archivo.name}" supera los ${MAX_FOTO_MB}MB. No se subió.`, "error");
+        continue;
+      }
+
       const extension = archivo.name.split(".").pop();
       const nombre = `${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
 
@@ -125,24 +177,55 @@ export default function AdminPage() {
   };
 
   const guardar = async () => {
-    if (!form.titulo || !form.precio || !form.ubicacion || !form.descripcion) {
-      mostrarMensaje("Completá todos los campos obligatorios.", "error");
-      return;
+    // Validaciones
+    if (!form.titulo.trim()) {
+      mostrarMensaje("El título es obligatorio.", "error"); return;
+    }
+    if (!form.precio_display.trim()) {
+      mostrarMensaje("El precio es obligatorio.", "error"); return;
+    }
+    if (!form.ubicacion.trim()) {
+      mostrarMensaje("La ubicación es obligatoria.", "error"); return;
+    }
+    if (!form.localidad.trim()) {
+      mostrarMensaje("La localidad es obligatoria.", "error"); return;
+    }
+    if (!form.descripcion.trim()) {
+      mostrarMensaje("La descripción es obligatoria.", "error"); return;
     }
 
     setGuardando(true);
+
     const datos = {
-      ...form,
+      titulo: form.titulo.trim(),
+      operacion: form.operacion,
+      tipo: form.tipo,
+      precio_valor: parseNumericField(form.precio_valor),
+      moneda: form.moneda,
+      precio_display: form.precio_display.trim(),
+      ubicacion: form.ubicacion.trim(),
+      localidad: form.localidad.trim(),
+      descripcion: form.descripcion.trim(),
       imagenes: fotosPreview,
-      ambientes: form.ambientes ? Number(form.ambientes) : null,
-      banos: form.banos ? Number(form.banos) : null,
+      superficie_m2: parseNumericField(form.superficie_m2),
+      superficie_ha: parseNumericField(form.superficie_ha),
+      ambientes: parseNumericField(form.ambientes),
+      dormitorios: parseNumericField(form.dormitorios),
+      banos: parseNumericField(form.banos),
+      garage: form.garage,
+      destacada: form.destacada,
+      estado: form.estado,
+      seo_titulo: form.seo_titulo.trim() || null,
+      seo_descripcion: form.seo_descripcion.trim() || null,
     };
 
     if (editando?.id) {
+      // EDICIÓN — no regenerar slug
       const { error } = await supabase
         .from("propiedades")
         .update(datos)
         .eq("id", editando.id);
+
       if (error) {
         mostrarMensaje("Error al guardar los cambios.", "error");
       } else {
@@ -151,15 +234,33 @@ export default function AdminPage() {
         cargarPropiedades();
       }
     } else {
-      const { error } = await supabase.from("propiedades").insert(datos);
-      if (error) {
+      // CREACIÓN — insertar primero para obtener el id, luego generar el slug
+      const { data: nueva, error: errorInsert } = await supabase
+        .from("propiedades")
+        .insert(datos)
+        .select("id")
+        .single();
+
+      if (errorInsert || !nueva) {
         mostrarMensaje("Error al crear la propiedad.", "error");
       } else {
-        mostrarMensaje("Propiedad creada correctamente.", "ok");
+        // Generar slug con el id real recién asignado
+        const slug = buildSlug(datos.titulo, datos.localidad, nueva.id);
+        const { error: errorSlug } = await supabase
+          .from("propiedades")
+          .update({ slug })
+          .eq("id", nueva.id);
+
+        if (errorSlug) {
+          mostrarMensaje("Propiedad creada, pero hubo un error generando el slug.", "error");
+        } else {
+          mostrarMensaje("Propiedad creada correctamente.", "ok");
+        }
         cerrarModal();
         cargarPropiedades();
       }
     }
+
     setGuardando(false);
   };
 
@@ -180,6 +281,28 @@ export default function AdminPage() {
     await supabase.auth.signOut();
     router.push("/admin/login");
     router.refresh();
+  };
+
+  const etiquetaEstado = (estado: string) => {
+    const mapa: Record<string, string> = {
+      publicada: "Publicada",
+      pausada: "Pausada",
+      reservada: "Reservada",
+      vendida: "Vendida",
+      alquilada: "Alquilada",
+    };
+    return mapa[estado] ?? estado;
+  };
+
+  const colorEstado = (estado: string) => {
+    const mapa: Record<string, string> = {
+      publicada: "bg-green-500/20 text-green-400 border-green-500/30",
+      pausada: "bg-white/10 text-white/50 border-white/20",
+      reservada: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+      vendida: "bg-red-500/20 text-red-400 border-red-500/30",
+      alquilada: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    };
+    return mapa[estado] ?? "";
   };
 
   return (
@@ -205,6 +328,7 @@ export default function AdminPage() {
 
       <div className="max-w-6xl mx-auto px-6 py-10">
 
+        {/* TOAST */}
         {mensaje && (
           <div className={`fixed top-6 right-6 z-50 px-5 py-3 rounded-xl text-sm font-semibold shadow-lg ${
             mensaje.tipo === "ok" ? "bg-green-500 text-white" : "bg-red-500 text-white"
@@ -245,6 +369,7 @@ export default function AdminPage() {
               >
                 <div className="flex gap-4 items-start">
                   {prop.imagenes?.[0] ? (
+                    // eslint-disable-next-line @next/next/no-img-element
                     <img src={prop.imagenes[0]} alt={prop.titulo} className="w-16 h-16 object-cover rounded-lg flex-shrink-0" />
                   ) : (
                     <div className="w-16 h-16 bg-white/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -252,15 +377,22 @@ export default function AdminPage() {
                     </div>
                   )}
                   <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">{prop.tipo}</span>
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="bg-orange-500 text-white text-xs px-2 py-0.5 rounded-full">{prop.operacion}</span>
+                      <span className="bg-white/10 text-white/70 text-xs px-2 py-0.5 rounded-full">{prop.tipo}</span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full border ${colorEstado(prop.estado)}`}>
+                        {etiquetaEstado(prop.estado)}
+                      </span>
+                      {prop.destacada && (
+                        <span className="bg-orange-500/20 text-orange-400 border border-orange-500/30 text-xs px-2 py-0.5 rounded-full">
+                          Destacada
+                        </span>
+                      )}
                       <span className="text-white/40 text-xs">{prop.imagenes?.length || 0} fotos</span>
-                      {prop.superficie && <span className="text-white/40 text-xs">{prop.superficie} m²</span>}
-                      {prop.ambientes && <span className="text-white/40 text-xs">{prop.ambientes} amb.</span>}
                     </div>
                     <h3 className="font-semibold">{prop.titulo}</h3>
-                    <p className="text-white/50 text-sm">{prop.ubicacion}</p>
-                    <p className="text-orange-400 font-bold text-sm mt-0.5">{prop.precio}</p>
+                    <p className="text-white/50 text-sm">{prop.localidad}</p>
+                    <p className="text-orange-400 font-bold text-sm mt-0.5">{prop.precio_display}</p>
                   </div>
                 </div>
 
@@ -276,7 +408,7 @@ export default function AdminPage() {
                   {confirmarEliminar === prop.id ? (
                     <div className="flex gap-2">
                       <button
-                        onClick={() => eliminar(prop.id!)}
+                        onClick={() => eliminar(prop.id)}
                         disabled={eliminandoId === prop.id}
                         className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm transition disabled:opacity-50"
                       >
@@ -291,7 +423,7 @@ export default function AdminPage() {
                     </div>
                   ) : (
                     <button
-                      onClick={() => setConfirmarEliminar(prop.id!)}
+                      onClick={() => setConfirmarEliminar(prop.id)}
                       className="flex items-center gap-2 bg-red-500/20 hover:bg-red-500/40 border border-red-500/30 px-4 py-2 rounded-lg text-sm text-red-400 transition"
                     >
                       <FaTrash size={12} />
@@ -319,64 +451,124 @@ export default function AdminPage() {
               </button>
             </div>
 
-            <div className="px-6 py-6 grid gap-4">
+            <div className="px-6 py-6 grid gap-5">
 
+              {/* TÍTULO */}
+              <div>
+                <label className="text-sm text-white/60 mb-1 block">Título *</label>
+                <input
+                  type="text"
+                  placeholder="Ej: Casa con pileta y quincho"
+                  value={form.titulo}
+                  onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+                  className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                />
+              </div>
+
+              {/* OPERACIÓN + TIPO */}
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-white/60 mb-1 block">Título *</label>
-                  <input
-                    type="text"
-                    placeholder="Ej: Casa con pileta"
-                    value={form.titulo}
-                    onChange={(e) => setForm({ ...form, titulo: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-white/60 mb-1 block">Tipo *</label>
+                  <label className="text-sm text-white/60 mb-1 block">Operación *</label>
                   <select
-                    value={form.tipo}
-                    onChange={(e) => setForm({ ...form, tipo: e.target.value as "Venta" | "Alquiler" })}
+                    value={form.operacion}
+                    onChange={(e) => setForm({ ...form, operacion: e.target.value as "Venta" | "Alquiler" })}
                     className="w-full px-4 py-3 rounded-lg bg-[#0B1F3A] border border-white/20 outline-none focus:border-orange-500 transition text-white"
                   >
-                    <option value="Venta">Venta</option>
-                    <option value="Alquiler">Alquiler</option>
+                    {OPERACIONES.map((op) => (
+                      <option key={op} value={op}>{op}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Tipo de propiedad *</label>
+                  <select
+                    value={form.tipo}
+                    onChange={(e) => setForm({ ...form, tipo: e.target.value as PropiedadForm["tipo"] })}
+                    className="w-full px-4 py-3 rounded-lg bg-[#0B1F3A] border border-white/20 outline-none focus:border-orange-500 transition text-white"
+                  >
+                    {TIPOS_PROPIEDAD.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
                   </select>
                 </div>
               </div>
 
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-sm text-white/60 mb-1 block">Precio *</label>
+              {/* PRECIO */}
+              <div>
+                <label className="text-sm text-white/60 mb-1 block">Precio</label>
+                <div className="grid sm:grid-cols-3 gap-3">
+                  <select
+                    value={form.moneda}
+                    onChange={(e) => handleMoneda(e.target.value as "USD" | "ARS")}
+                    className="px-4 py-3 rounded-lg bg-[#0B1F3A] border border-white/20 outline-none focus:border-orange-500 transition text-white"
+                  >
+                    {MONEDAS.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                  <input
+                    type="number"
+                    placeholder="80000"
+                    value={form.precio_valor}
+                    onChange={(e) => handlePrecioValor(e.target.value)}
+                    className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
                   <input
                     type="text"
-                    placeholder="Ej: USD 80.000"
-                    value={form.precio}
-                    onChange={(e) => setForm({ ...form, precio: e.target.value })}
-                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                    placeholder="Ej: A convenir"
+                    value={form.precio_display}
+                    onChange={(e) => setForm({ ...form, precio_display: e.target.value })}
+                    className="px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
                   />
                 </div>
+                <p className="text-white/30 text-xs mt-1">
+                  El texto de display se genera automáticamente. Podés editarlo si necesitás mostrar &quot;A convenir&quot; u otro valor especial.
+                </p>
+              </div>
+
+              {/* UBICACIÓN + LOCALIDAD */}
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="text-sm text-white/60 mb-1 block">Ubicación *</label>
+                  <label className="text-sm text-white/60 mb-1 block">Ubicación visible *</label>
                   <input
                     type="text"
-                    placeholder="Ej: La Plata, Buenos Aires"
+                    placeholder="Ej: Av. Principal 456, Gonzalez Chaves"
                     value={form.ubicacion}
                     onChange={(e) => setForm({ ...form, ubicacion: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
                   />
                 </div>
-              </div>
-
-              {/* CAMPOS NUEVOS */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <div>
-                  <label className="text-sm text-white/60 mb-1 block">Superficie (m²)</label>
+                  <label className="text-sm text-white/60 mb-1 block">Localidad *</label>
                   <input
                     type="text"
-                    placeholder="Ej: 120"
-                    value={form.superficie || ""}
-                    onChange={(e) => setForm({ ...form, superficie: e.target.value })}
+                    placeholder="Ej: Adolfo Gonzalez Chaves"
+                    value={form.localidad}
+                    onChange={(e) => setForm({ ...form, localidad: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+              </div>
+
+              {/* CARACTERÍSTICAS */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Superficie m²</label>
+                  <input
+                    type="number"
+                    placeholder="120"
+                    value={form.superficie_m2}
+                    onChange={(e) => setForm({ ...form, superficie_m2: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Superficie ha</label>
+                  <input
+                    type="number"
+                    placeholder="1500"
+                    value={form.superficie_ha}
+                    onChange={(e) => setForm({ ...form, superficie_ha: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
                   />
                 </div>
@@ -384,18 +576,31 @@ export default function AdminPage() {
                   <label className="text-sm text-white/60 mb-1 block">Ambientes</label>
                   <input
                     type="number"
-                    placeholder="Ej: 3"
-                    value={form.ambientes || ""}
+                    placeholder="3"
+                    value={form.ambientes}
                     onChange={(e) => setForm({ ...form, ambientes: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
                   />
                 </div>
                 <div>
+                  <label className="text-sm text-white/60 mb-1 block">Dormitorios</label>
+                  <input
+                    type="number"
+                    placeholder="2"
+                    value={form.dormitorios}
+                    onChange={(e) => setForm({ ...form, dormitorios: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div>
                   <label className="text-sm text-white/60 mb-1 block">Baños</label>
                   <input
                     type="number"
-                    placeholder="Ej: 2"
-                    value={form.banos || ""}
+                    placeholder="2"
+                    value={form.banos}
                     onChange={(e) => setForm({ ...form, banos: e.target.value })}
                     className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
                   />
@@ -407,7 +612,7 @@ export default function AdminPage() {
                     className={`w-full px-4 py-3 rounded-lg border cursor-pointer transition flex items-center gap-2 ${
                       form.garage
                         ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
-                        : "bg-white/10 border border-white/20 text-white/40"
+                        : "bg-white/10 border-white/20 text-white/40"
                     }`}
                   >
                     <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${form.garage ? "border-orange-400 bg-orange-400" : "border-white/30"}`}>
@@ -416,8 +621,39 @@ export default function AdminPage() {
                     <span className="text-sm">{form.garage ? "Sí" : "No"}</span>
                   </div>
                 </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Destacada</label>
+                  <div
+                    onClick={() => setForm({ ...form, destacada: !form.destacada })}
+                    className={`w-full px-4 py-3 rounded-lg border cursor-pointer transition flex items-center gap-2 ${
+                      form.destacada
+                        ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
+                        : "bg-white/10 border-white/20 text-white/40"
+                    }`}
+                  >
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${form.destacada ? "border-orange-400 bg-orange-400" : "border-white/30"}`}>
+                      {form.destacada && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <span className="text-sm">{form.destacada ? "Sí" : "No"}</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Estado</label>
+                  <select
+                    value={form.estado}
+                    onChange={(e) => setForm({ ...form, estado: e.target.value as PropiedadForm["estado"] })}
+                    className="w-full px-4 py-3 rounded-lg bg-[#0B1F3A] border border-white/20 outline-none focus:border-orange-500 transition text-white"
+                  >
+                    {ESTADOS_PROPIEDAD.map((e) => (
+                      <option key={e} value={e} style={{ textTransform: "capitalize" }}>
+                        {e.charAt(0).toUpperCase() + e.slice(1)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
+              {/* DESCRIPCIÓN */}
               <div>
                 <label className="text-sm text-white/60 mb-1 block">Descripción *</label>
                 <textarea
@@ -429,7 +665,7 @@ export default function AdminPage() {
                 />
               </div>
 
-              {/* SUBIDA DE FOTOS */}
+              {/* FOTOS */}
               <div>
                 <label className="text-sm text-white/60 mb-2 block">Fotos de la propiedad</label>
                 <label className={`flex items-center justify-center gap-2 w-full px-4 py-4 rounded-lg border-2 border-dashed cursor-pointer transition ${
@@ -447,37 +683,79 @@ export default function AdminPage() {
                   />
                   <FaUpload className={subiendoFotos ? "text-orange-400 animate-bounce" : "text-white/40"} size={16} />
                   <span className={`text-sm ${subiendoFotos ? "text-orange-400" : "text-white/40"}`}>
-                    {subiendoFotos ? "Subiendo fotos..." : "Hacé click o arrastrá fotos acá"}
+                    {subiendoFotos ? "Subiendo fotos..." : `Hacé click o arrastrá fotos acá (máx ${MAX_FOTO_MB}MB c/u)`}
                   </span>
                 </label>
 
                 {fotosPreview.length > 0 && (
-                  <div className="mt-3 grid grid-cols-4 gap-2">
-                    {fotosPreview.map((url, i) => (
-                      <div key={i} className="relative group">
-                        <img src={url} alt={`foto-${i}`} className="w-full h-20 object-cover rounded-lg" />
-                        <button
-                          onClick={() => eliminarFoto(i)}
-                          className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
-                        >
-                          <FaTimes size={8} />
-                        </button>
-                        {i === 0 && (
-                          <span className="absolute bottom-1 left-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded">
-                            Principal
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {fotosPreview.length > 0 && (
-                  <p className="text-white/30 text-xs mt-2">
-                    {fotosPreview.length} foto(s) · La primera es la imagen principal · Pasá el mouse sobre una foto para eliminarla
-                  </p>
+                  <>
+                    <div className="mt-3 grid grid-cols-4 gap-2">
+                      {fotosPreview.map((url, i) => (
+                        <div key={i} className="relative group">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`foto-${i}`} className="w-full h-20 object-cover rounded-lg" />
+                          <button
+                            onClick={() => eliminarFoto(i)}
+                            className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                          >
+                            <FaTimes size={8} />
+                          </button>
+                          {i === 0 && (
+                            <span className="absolute bottom-1 left-1 bg-orange-500 text-white text-xs px-1.5 py-0.5 rounded">
+                              Principal
+                            </span>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-white/30 text-xs mt-2">
+                      {fotosPreview.length} foto(s) · La primera es la imagen principal · Pasá el mouse sobre una foto para eliminarla
+                    </p>
+                  </>
                 )}
               </div>
+
+              {/* SEO COLAPSABLE */}
+              <div className="border border-white/10 rounded-xl overflow-hidden">
+                <button
+                  type="button"
+                  onClick={() => setSeoAbierto(!seoAbierto)}
+                  className="w-full flex items-center justify-between px-4 py-3 bg-white/5 hover:bg-white/10 transition text-sm text-white/60"
+                >
+                  <span>Opciones de SEO (opcional)</span>
+                  {seoAbierto ? <FaChevronUp size={12} /> : <FaChevronDown size={12} />}
+                </button>
+                {seoAbierto && (
+                  <div className="px-4 py-4 grid gap-4">
+                    <p className="text-white/40 text-xs">
+                      Si los dejás vacíos, el SEO se genera automáticamente a partir del título y la descripción.
+                    </p>
+                    <div>
+                      <label className="text-sm text-white/60 mb-1 block">Título SEO</label>
+                      <input
+                        type="text"
+                        placeholder="Título para buscadores (máx 60 caracteres)"
+                        value={form.seo_titulo}
+                        onChange={(e) => setForm({ ...form, seo_titulo: e.target.value })}
+                        maxLength={60}
+                        className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-sm text-white/60 mb-1 block">Descripción SEO</label>
+                      <textarea
+                        placeholder="Descripción para buscadores (máx 155 caracteres)"
+                        rows={2}
+                        value={form.seo_descripcion}
+                        onChange={(e) => setForm({ ...form, seo_descripcion: e.target.value })}
+                        maxLength={155}
+                        className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30 resize-none"
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
             </div>
 
             <div className="px-6 py-4 border-t border-white/10 flex justify-end gap-3">

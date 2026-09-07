@@ -1,23 +1,93 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import "./globals.css";
 import Navbar from "../components/Navbar";
+import Footer from "../components/layout/Footer";
+import WhatsAppFloat from "../components/ui/WhatsAppFloat";
 import { headers } from "next/headers";
+import {
+  NOMBRE_INMOBILIARIA,
+  SEO_DESCRIPTION_DEFAULT,
+  SITE_URL,
+  PHONE_NUMBER,
+  INSTAGRAM_URL,
+  FACEBOOK_URL,
+  LOCALIDAD_PRINCIPAL,
+  PROVINCIA,
+} from "../lib/config";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "Marquez Negocios Inmobiliarios",
-  description:
-    "Compra, venta y alquiler de propiedades en La Plata y alrededores. Asesoramiento profesional.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: NOMBRE_INMOBILIARIA,
+    template: `%s | ${NOMBRE_INMOBILIARIA}`,
+  },
+  description: SEO_DESCRIPTION_DEFAULT,
+  keywords: [
+    "inmobiliaria",
+    "propiedades",
+    "venta de propiedades",
+    "alquiler de propiedades",
+    LOCALIDAD_PRINCIPAL,
+    PROVINCIA,
+    "casas en venta",
+    "terrenos",
+    "campos",
+  ],
+  openGraph: {
+    type: "website",
+    locale: "es_AR",
+    siteName: NOMBRE_INMOBILIARIA,
+    title: NOMBRE_INMOBILIARIA,
+    description: SEO_DESCRIPTION_DEFAULT,
+    images: [
+      {
+        url: "/og-default.svg",
+        width: 1200,
+        height: 630,
+        alt: NOMBRE_INMOBILIARIA,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: NOMBRE_INMOBILIARIA,
+    description: SEO_DESCRIPTION_DEFAULT,
+    images: ["/og-default.svg"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
+};
+
+// Schema.org RealEstateAgent (JSON-LD global)
+const schemaOrg = {
+  "@context": "https://schema.org",
+  "@type": ["RealEstateAgent", "LocalBusiness"],
+  name: NOMBRE_INMOBILIARIA,
+  telephone: PHONE_NUMBER,
+  url: SITE_URL,
+  sameAs: [INSTAGRAM_URL, FACEBOOK_URL].filter(Boolean),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: LOCALIDAD_PRINCIPAL,
+    addressRegion: PROVINCIA,
+    addressCountry: "AR",
+  },
+  openingHours: "Mo-Sa 09:00-18:00",
+  contactPoint: {
+    "@type": "ContactPoint",
+    contactType: "customer service",
+    telephone: PHONE_NUMBER,
+    availableLanguage: "Spanish",
+  },
 };
 
 export default async function RootLayout({
@@ -30,13 +100,20 @@ export default async function RootLayout({
   const esAdmin = pathname.startsWith("/admin");
 
   return (
-    <html
-      lang="es"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
+    <html lang="es" className={`${geistSans.variable} h-full antialiased`}>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaOrg) }}
+        />
+      </head>
       <body className="min-h-full flex flex-col bg-[#0B1F3A] text-white">
         {!esAdmin && <Navbar />}
-        {children}
+        <div className="flex-1 flex flex-col">
+          {children}
+        </div>
+        {!esAdmin && <Footer />}
+        {!esAdmin && <WhatsAppFloat />}
       </body>
     </html>
   );
