@@ -22,19 +22,19 @@ export default function Footer() {
         {/* BRAND */}
         <div>
           <Link href="/" className="inline-block mb-5">
+            {/* Logo footer: más grande que el header para mayor presencia */}
             <Image
               src="/logo-marquez.png"
               alt="MarQuez Negocios Inmobiliarios"
-              width={200}
-              height={100}
-              className="h-14 w-auto object-contain"
+              width={390}
+              height={175}
+              className="h-20 w-auto object-contain"
             />
           </Link>
           <p className="text-white/50 text-sm leading-relaxed mb-5">
             Asesoramiento inmobiliario personalizado en compra, venta y alquiler
             de propiedades en {UBICACION_DISPLAY}.
           </p>
-          {/* Redes sociales */}
           <div className="flex gap-3">
             {INSTAGRAM_URL && (
               <a

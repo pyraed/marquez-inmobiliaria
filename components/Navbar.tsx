@@ -35,7 +35,7 @@ export default function Navbar() {
 
   useEffect(() => {
     if (menuAbierto) setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
   useEffect(() => {
@@ -72,16 +72,18 @@ export default function Navbar() {
             : "bg-[#0B1F3A]/80 backdrop-blur-sm border-white/5"
         }`}
       >
-        <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center">
+        <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center gap-6">
 
-          {/* LOGO */}
-          <Link href="/" className="flex items-center select-none shrink-0">
+          {/* LOGO — el PNG recortado mide 780x350, proporción 2.23:1
+              En desktop: altura fija 64px → ancho automático ~143px de contenido visible
+              En mobile: altura 52px */}
+          <Link href="/" className="shrink-0 flex items-center">
             <Image
               src="/logo-marquez.png"
               alt="MarQuez Negocios Inmobiliarios"
-              width={180}
-              height={90}
-              className="h-10 w-auto object-contain"
+              width={390}
+              height={175}
+              className="h-16 w-auto md:h-[70px] object-contain"
               priority
             />
           </Link>
@@ -92,7 +94,7 @@ export default function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
-                className={`transition-all duration-200 font-medium relative group ${
+                className={`transition-all duration-200 font-medium relative group whitespace-nowrap ${
                   isActive(link.href)
                     ? "text-orange-400"
                     : "text-white/80 hover:text-white"
@@ -109,14 +111,14 @@ export default function Navbar() {
           </nav>
 
           {/* CTA + HAMBURGUESA */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 shrink-0">
             <a
               href={WHATSAPP_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5"
+              className="hidden sm:flex items-center gap-2 bg-orange-500 hover:bg-orange-600 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 hover:shadow-lg hover:shadow-orange-500/25 hover:-translate-y-0.5 whitespace-nowrap"
             >
-              <FaWhatsapp />
+              <FaWhatsapp size={16} />
               Contactar
             </a>
 
