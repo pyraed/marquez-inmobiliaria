@@ -71,6 +71,7 @@ export default function Footer() {
             {[
               { href: "/", label: "Inicio" },
               { href: "/propiedades", label: "Propiedades" },
+              { href: "/servicios", label: "Servicios" },
               { href: "/propiedades?operacion=Venta", label: "Propiedades en venta" },
               { href: "/propiedades?operacion=Alquiler", label: "Propiedades en alquiler" },
               { href: "/tasaciones", label: "Tasaciones" },

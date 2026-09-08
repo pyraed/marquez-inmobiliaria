@@ -129,7 +129,7 @@ export default async function Home() {
             Servicios pensados para cada etapa de tu proceso inmobiliario
           </p>
         </ScrollReveal>
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 mb-10">
           {[
             {
               icon: <FaHome size={26} />,
@@ -161,6 +161,17 @@ export default async function Home() {
             </ScrollReveal>
           ))}
         </div>
+        <ScrollReveal>
+          <div className="text-center">
+            <Link
+              href="/servicios"
+              className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 px-8 py-3 rounded-full font-semibold transition-all duration-300 hover:-translate-y-0.5 text-sm"
+            >
+              Conocé todos nuestros servicios
+              <FaArrowRight size={12} />
+            </Link>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* ════════ PROPIEDADES DESTACADAS ════════ */}

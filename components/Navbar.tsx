@@ -3,22 +3,14 @@
 import Link from "next/link";
 import Image from "next/image";
 import { FaWhatsapp } from "react-icons/fa";
-import { useState, useEffect, useCallback } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { WHATSAPP_URL } from "../lib/config";
 
-// CAUSA DEL BUG DE HASHES:
-// Next.js <Link href="/#servicios"> desde pathname="/" no detecta cambio de ruta
-// y el router no dispara una nueva navegación → el hash anterior persiste
-// generando URLs como /#servicios#servicios.
-// <Link href="/"> desde /#servicios tampoco limpia el hash porque pathname no cambia.
-//
-// SOLUCIÓN: interceptar con onClick los casos donde el pathname no cambia,
-// usando router.push() para forzar la navegación completa, y scrollIntoView
-// para el anchor en la misma página.
-
-const PAGE_LINKS = [
+const links = [
+  { href: "/",            label: "Inicio"      },
   { href: "/propiedades", label: "Propiedades" },
+  { href: "/servicios",   label: "Servicios"   },
   { href: "/tasaciones",  label: "Tasaciones"  },
   { href: "/contacto",    label: "Contacto"    },
 ];
@@ -28,7 +20,6 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const pathname = usePathname();
-  const router = useRouter();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +34,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    if (menuAbierto) setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
+    setMenuAbierto(false); // eslint-disable-line react-hooks/set-state-in-effect
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
@@ -57,56 +48,10 @@ export default function Navbar() {
     return () => document.removeEventListener("click", handler);
   }, [menuAbierto]);
 
-  // Inicio: siempre ir a /, limpiando cualquier hash
-  const handleInicio = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setMenuAbierto(false);
-    if (pathname === "/" && window.location.hash) {
-      // Mismo pathname pero tiene hash → limpiar con router.push
-      router.push("/");
-    } else if (pathname !== "/") {
-      router.push("/");
-    }
-    // Si ya estamos en / sin hash, el Link lo maneja normalmente (scroll top)
-  }, [pathname, router]);
-
-  // Servicios: scroll si ya estamos en /, navegar si no
-  const handleServicios = useCallback((e: React.MouseEvent) => {
-    e.preventDefault();
-    setMenuAbierto(false);
-    if (pathname === "/") {
-      // Scroll al elemento y actualizar URL
-      const el = document.getElementById("servicios");
-      if (el) {
-        el.scrollIntoView({ behavior: "smooth" });
-        window.history.replaceState(null, "", "/#servicios");
-      }
-    } else {
-      // Navegar a home con hash
-      router.push("/#servicios");
-    }
-  }, [pathname, router]);
-
   const isActive = (href: string) => {
-    const path = href.split("#")[0];
-    if (path === "/") return pathname === "/";
-    return pathname.startsWith(path) && path !== "/";
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
   };
-
-  const desktopLinkClass = (active: boolean) =>
-    `transition-all duration-200 font-medium relative group whitespace-nowrap cursor-pointer ${
-      active ? "text-orange-400" : "text-white/80 hover:text-white"
-    }`;
-
-  const mobileLinkClass = (active: boolean) =>
-    `text-sm font-medium transition py-1 cursor-pointer ${
-      active ? "text-orange-400" : "text-white/80 hover:text-orange-400"
-    }`;
-
-  const underline = (active: boolean) =>
-    `absolute -bottom-0.5 left-0 h-px bg-orange-400 transition-all duration-300 ${
-      active ? "w-full" : "w-0 group-hover:w-full"
-    }`;
 
   return (
     <>
@@ -130,7 +75,7 @@ export default function Navbar() {
         <div className="max-w-6xl mx-auto px-6 py-3 flex justify-between items-center gap-6">
 
           {/* LOGO */}
-          <Link href="/" onClick={handleInicio} className="shrink-0 flex items-center">
+          <Link href="/" className="shrink-0 flex items-center">
             <Image
               src="/logo-marquez.png"
               alt="MarQuez Negocios Inmobiliarios"
@@ -143,28 +88,24 @@ export default function Navbar() {
 
           {/* NAV DESKTOP */}
           <nav className="hidden md:flex gap-7 text-sm items-center" aria-label="Navegación principal">
-
-            <Link href="/" onClick={handleInicio} className={desktopLinkClass(pathname === "/")}>
-              Inicio
-              <span className={underline(pathname === "/")} />
-            </Link>
-
-            {PAGE_LINKS.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={desktopLinkClass(isActive(link.href))}
+                className={`transition-all duration-200 font-medium relative group whitespace-nowrap ${
+                  isActive(link.href)
+                    ? "text-orange-400"
+                    : "text-white/80 hover:text-white"
+                }`}
               >
                 {link.label}
-                <span className={underline(isActive(link.href))} />
+                <span
+                  className={`absolute -bottom-0.5 left-0 h-px bg-orange-400 transition-all duration-300 ${
+                    isActive(link.href) ? "w-full" : "w-0 group-hover:w-full"
+                  }`}
+                />
               </Link>
             ))}
-
-            <Link href="/#servicios" onClick={handleServicios} className={desktopLinkClass(false)}>
-              Servicios
-              <span className={underline(false)} />
-            </Link>
-
           </nav>
 
           {/* CTA + HAMBURGUESA */}
@@ -198,24 +139,17 @@ export default function Navbar() {
             className="bg-[#0B1F3A]/98 backdrop-blur-md border-t border-white/10 px-6 py-5 flex flex-col gap-4"
             aria-label="Menú móvil"
           >
-            <Link href="/" onClick={handleInicio} className={mobileLinkClass(pathname === "/")}>
-              Inicio
-            </Link>
-
-            {PAGE_LINKS.map((link) => (
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className={mobileLinkClass(isActive(link.href))}
+                className={`text-sm font-medium transition py-1 ${
+                  isActive(link.href) ? "text-orange-400" : "text-white/80 hover:text-orange-400"
+                }`}
               >
                 {link.label}
               </Link>
             ))}
-
-            <Link href="/#servicios" onClick={handleServicios} className={mobileLinkClass(false)}>
-              Servicios
-            </Link>
-
             <a
               href={WHATSAPP_URL}
               target="_blank"
