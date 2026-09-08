@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { unstable_cache } from "next/cache";
 import { createPublicClient } from "../../../lib/supabase-public";
 import PropiedadCard from "../../../components/propiedades/PropiedadCard";
 import FiltrosPropiedades from "../../../components/propiedades/FiltrosPropiedades";
@@ -27,71 +28,69 @@ interface Props {
   searchParams: Promise<SearchParams>;
 }
 
-// Función de timing compatible con Server Components (no usa performance.now)
-function now() { return Date.now(); }
-
-export default async function PropiedadesPage({ searchParams }: Props) {
-  const T0 = now();
-  console.log(`[PROP] START ${new Date().toISOString()}`);
-
-  const params = await searchParams;
-  console.log(`[PROP] searchParams: ${now() - T0}ms`);
-
-  const supabase = createPublicClient();
-  console.log(`[PROP] client created: ${now() - T0}ms`);
-
-  let query = supabase
-    .from("propiedades")
-    .select("id, slug, titulo, operacion, tipo, precio_display, precio_valor, ubicacion, localidad, imagenes, dormitorios, banos, superficie_m2, ambientes")
-    .in("estado", ["publicada", "reservada"]);
-
-  if (params.operacion) query = query.eq("operacion", params.operacion);
-  if (params.tipo) query = query.eq("tipo", params.tipo);
-  if (params.localidad) query = query.eq("localidad", params.localidad);
-  if (params.precioMin) {
-    const min = Number(params.precioMin);
-    if (!isNaN(min)) query = query.gte("precio_valor", min);
-  }
-  if (params.precioMax) {
-    const max = Number(params.precioMax);
-    if (!isNaN(max)) query = query.lte("precio_valor", max);
-  }
-  if (params.q) {
-    query = query.or(`titulo.ilike.%${params.q}%,ubicacion.ilike.%${params.q}%,localidad.ilike.%${params.q}%`);
-  }
-  if (params.orden === "precio_asc") {
-    query = query.order("precio_valor", { ascending: true, nullsFirst: false });
-  } else if (params.orden === "precio_desc") {
-    query = query.order("precio_valor", { ascending: false, nullsFirst: false });
-  } else {
-    query = query.order("created_at", { ascending: false });
-  }
-
-  const T_QUERIES = now();
-  console.log(`[PROP] queries start: ${T_QUERIES - T0}ms`);
-
-  const [propiedadesResult, localidadesResult] = await Promise.all([
-    query,
-    supabase
+// Cachea las localidades únicas — cambian muy poco, cache de 5 minutos.
+// Independiente de los filtros aplicados.
+const getLocalidades = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data } = await supabase
       .from("propiedades")
       .select("localidad")
       .in("estado", ["publicada", "reservada"])
-      .order("localidad"),
+      .order("localidad");
+    return [...new Set((data || []).map((p: { localidad: string }) => p.localidad).filter(Boolean))];
+  },
+  ["localidades"],
+  { revalidate: 300 } // 5 minutos
+);
+
+// Cachea las propiedades filtradas — cache de 60 segundos por combinación de filtros.
+const getPropiedades = unstable_cache(
+  async (filtros: SearchParams) => {
+    const supabase = createPublicClient();
+
+    let query = supabase
+      .from("propiedades")
+      .select("id, slug, titulo, operacion, tipo, precio_display, precio_valor, ubicacion, localidad, imagenes, dormitorios, banos, superficie_m2, ambientes")
+      .in("estado", ["publicada", "reservada"]);
+
+    if (filtros.operacion) query = query.eq("operacion", filtros.operacion);
+    if (filtros.tipo) query = query.eq("tipo", filtros.tipo);
+    if (filtros.localidad) query = query.eq("localidad", filtros.localidad);
+    if (filtros.precioMin) {
+      const min = Number(filtros.precioMin);
+      if (!isNaN(min)) query = query.gte("precio_valor", min);
+    }
+    if (filtros.precioMax) {
+      const max = Number(filtros.precioMax);
+      if (!isNaN(max)) query = query.lte("precio_valor", max);
+    }
+    if (filtros.q) {
+      query = query.or(`titulo.ilike.%${filtros.q}%,ubicacion.ilike.%${filtros.q}%,localidad.ilike.%${filtros.q}%`);
+    }
+    if (filtros.orden === "precio_asc") {
+      query = query.order("precio_valor", { ascending: true, nullsFirst: false });
+    } else if (filtros.orden === "precio_desc") {
+      query = query.order("precio_valor", { ascending: false, nullsFirst: false });
+    } else {
+      query = query.order("created_at", { ascending: false });
+    }
+
+    const { data } = await query;
+    return (data as unknown as PropiedadCardType[]) || [];
+  },
+  ["propiedades-filtradas"],
+  { revalidate: 60 } // 60 segundos
+);
+
+export default async function PropiedadesPage({ searchParams }: Props) {
+  const params = await searchParams;
+
+  // Las dos queries corren en paralelo, ambas cacheadas
+  const [propiedades, localidades] = await Promise.all([
+    getPropiedades(params),
+    getLocalidades(),
   ]);
-
-  const T_DONE = now();
-  console.log(`[PROP] queries done: total=${T_DONE - T0}ms | queries=${T_DONE - T_QUERIES}ms | propErr=${propiedadesResult.error?.message ?? "ok"} | locErr=${localidadesResult.error?.message ?? "ok"} | propRows=${propiedadesResult.data?.length ?? 0}`);
-
-  const propiedades = (propiedadesResult.data as unknown as PropiedadCardType[]) || [];
-  const localidades = [
-    ...new Set(
-      (localidadesResult.data || [])
-        .map((p: { localidad: string }) => p.localidad)
-        .filter(Boolean)
-    ),
-  ];
-
-  console.log(`[PROP] render start: ${now() - T0}ms`);
 
   return (
     <main className="bg-[#0B1F3A] text-white pt-24 min-h-screen">
