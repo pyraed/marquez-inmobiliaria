@@ -31,6 +31,10 @@ const FORM_VACIO: PropiedadForm = {
   dormitorios: "",
   banos: "",
   garage: false,
+  financiacion: false,
+  frente: "",
+  fondo: "",
+  unidades: "",
   destacada: false,
   estado: "publicada",
   seo_titulo: "",
@@ -104,6 +108,10 @@ export default function AdminPage() {
       dormitorios: prop.dormitorios?.toString() ?? "",
       banos: prop.banos?.toString() ?? "",
       garage: prop.garage,
+      financiacion: prop.financiacion,
+      frente: prop.frente?.toString() ?? "",
+      fondo: prop.fondo?.toString() ?? "",
+      unidades: prop.unidades?.toString() ?? "",
       destacada: prop.destacada,
       estado: prop.estado,
       seo_titulo: prop.seo_titulo ?? "",
@@ -214,6 +222,10 @@ export default function AdminPage() {
       dormitorios: parseNumericField(form.dormitorios),
       banos: parseNumericField(form.banos),
       garage: form.garage,
+      financiacion: form.financiacion,
+      frente: parseNumericField(form.frente),
+      fondo: parseNumericField(form.fondo),
+      unidades: parseNumericField(form.unidades),
       destacada: form.destacada,
       estado: form.estado,
       seo_titulo: form.seo_titulo.trim() || null,
@@ -609,6 +621,36 @@ export default function AdminPage() {
                   />
                 </div>
                 <div>
+                  <label className="text-sm text-white/60 mb-1 block">Frente (m)</label>
+                  <input
+                    type="number"
+                    placeholder="12.5"
+                    value={form.frente}
+                    onChange={(e) => setForm({ ...form, frente: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Fondo (m)</label>
+                  <input
+                    type="number"
+                    placeholder="35"
+                    value={form.fondo}
+                    onChange={(e) => setForm({ ...form, fondo: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Unidades</label>
+                  <input
+                    type="number"
+                    placeholder="1"
+                    value={form.unidades}
+                    onChange={(e) => setForm({ ...form, unidades: e.target.value })}
+                    className="w-full px-4 py-3 rounded-lg bg-white/10 border border-white/20 outline-none focus:border-orange-500 transition placeholder:text-white/30"
+                  />
+                </div>
+                <div>
                   <label className="text-sm text-white/60 mb-1 block">Garage</label>
                   <div
                     onClick={() => setForm({ ...form, garage: !form.garage })}
@@ -638,6 +680,22 @@ export default function AdminPage() {
                       {form.destacada && <span className="text-white text-xs">✓</span>}
                     </div>
                     <span className="text-sm">{form.destacada ? "Sí" : "No"}</span>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-sm text-white/60 mb-1 block">Financiación</label>
+                  <div
+                    onClick={() => setForm({ ...form, financiacion: !form.financiacion })}
+                    className={`w-full px-4 py-3 rounded-lg border cursor-pointer transition flex items-center gap-2 ${
+                      form.financiacion
+                        ? "bg-orange-500/20 border-orange-500/50 text-orange-400"
+                        : "bg-white/10 border-white/20 text-white/40"
+                    }`}
+                  >
+                    <div className={`w-4 h-4 rounded border-2 flex items-center justify-center ${form.financiacion ? "border-orange-400 bg-orange-400" : "border-white/30"}`}>
+                      {form.financiacion && <span className="text-white text-xs">✓</span>}
+                    </div>
+                    <span className="text-sm">{form.financiacion ? "Sí" : "No"}</span>
                   </div>
                 </div>
                 <div>

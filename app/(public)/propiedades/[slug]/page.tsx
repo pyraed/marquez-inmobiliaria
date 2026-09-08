@@ -8,7 +8,7 @@ import type { Metadata } from "next";
 import type { Propiedad, PropiedadCard as PropiedadCardType } from "../../../../types/propiedad";
 import {
   FaWhatsapp, FaPhone, FaMapMarkerAlt, FaRulerCombined,
-  FaDoorOpen, FaBath, FaCar, FaBed, FaArrowLeft,
+  FaDoorOpen, FaBath, FaCar, FaBed, FaArrowLeft, FaHandshake,
 } from "react-icons/fa";
 import {
   WHATSAPP_NUMBER, PHONE_HREF, PHONE_NUMBER,
@@ -100,6 +100,16 @@ export default async function PropiedadDetallePage({ params }: Props) {
       label: "Superficie",
       valor: `${propiedad.superficie_ha} ha`,
     },
+    (propiedad.frente && propiedad.fondo) && {
+      icon: <FaRulerCombined />,
+      label: "Medidas",
+      valor: `${propiedad.frente} × ${propiedad.fondo} m`,
+    },
+    (propiedad.frente && !propiedad.fondo) && {
+      icon: <FaRulerCombined />,
+      label: "Frente",
+      valor: `${propiedad.frente} m`,
+    },
     propiedad.dormitorios && {
       icon: <FaBed />,
       label: "Dormitorios",
@@ -119,6 +129,16 @@ export default async function PropiedadDetallePage({ params }: Props) {
       icon: <FaCar />,
       label: "Garage",
       valor: "Incluido",
+    },
+    propiedad.unidades && propiedad.unidades > 1 && {
+      icon: <FaDoorOpen />,
+      label: "Unidades",
+      valor: propiedad.unidades,
+    },
+    propiedad.financiacion && {
+      icon: <FaHandshake />,
+      label: "Financiación",
+      valor: "Disponible",
     },
   ].filter(Boolean) as { icon: React.ReactNode; label: string; valor: string | number }[];
 

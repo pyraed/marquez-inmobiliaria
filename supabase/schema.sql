@@ -20,7 +20,7 @@ CREATE TABLE propiedades (
   tipo            text NOT NULL
                     CHECK (tipo IN (
                       'Casa', 'Departamento', 'Terreno', 'Campo',
-                      'Local', 'Oficina', 'Cochera', 'Otro'
+                      'Local', 'Oficina', 'Cochera', 'Fondo de comercio', 'Otro'
                     )),
   precio_valor    numeric(15,2),
   moneda          text NOT NULL DEFAULT 'USD'
@@ -36,6 +36,10 @@ CREATE TABLE propiedades (
   dormitorios     integer,
   banos           integer,
   garage          boolean NOT NULL DEFAULT false,
+  financiacion    boolean NOT NULL DEFAULT false,
+  frente          numeric(8,2),
+  fondo           numeric(8,2),
+  unidades        integer,
   destacada       boolean NOT NULL DEFAULT false,
   estado          text NOT NULL DEFAULT 'publicada'
                     CHECK (estado IN (

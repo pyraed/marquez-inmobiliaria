@@ -4,7 +4,7 @@ export type Propiedad = {
   slug: string;
   titulo: string;
   operacion: "Venta" | "Alquiler";
-  tipo: "Casa" | "Departamento" | "Terreno" | "Campo" | "Local" | "Oficina" | "Cochera" | "Otro";
+  tipo: "Casa" | "Departamento" | "Terreno" | "Campo" | "Local" | "Oficina" | "Cochera" | "Fondo de comercio" | "Otro";
   precio_valor: number | null;
   moneda: "USD" | "ARS";
   precio_display: string;
@@ -18,6 +18,10 @@ export type Propiedad = {
   dormitorios: number | null;
   banos: number | null;
   garage: boolean;
+  financiacion: boolean;
+  frente: number | null;
+  fondo: number | null;
+  unidades: number | null;
   destacada: boolean;
   estado: "publicada" | "pausada" | "reservada" | "vendida" | "alquilada";
   latitud: number | null;
@@ -46,7 +50,7 @@ export type PropiedadCard = Pick<
 export type PropiedadForm = {
   titulo: string;
   operacion: "Venta" | "Alquiler";
-  tipo: "Casa" | "Departamento" | "Terreno" | "Campo" | "Local" | "Oficina" | "Cochera" | "Otro";
+  tipo: "Casa" | "Departamento" | "Terreno" | "Campo" | "Local" | "Oficina" | "Cochera" | "Fondo de comercio" | "Otro";
   precio_valor: string; // string en el form, se convierte a number al guardar
   moneda: "USD" | "ARS";
   precio_display: string;
@@ -60,6 +64,10 @@ export type PropiedadForm = {
   dormitorios: string;   // string en el form
   banos: string;         // string en el form
   garage: boolean;
+  financiacion: boolean;
+  frente: string;   // string en el form, se convierte a number al guardar
+  fondo: string;    // string en el form
+  unidades: string; // string en el form
   destacada: boolean;
   estado: "publicada" | "pausada" | "reservada" | "vendida" | "alquilada";
   seo_titulo: string;
@@ -76,6 +84,7 @@ export const TIPOS_PROPIEDAD = [
   "Local",
   "Oficina",
   "Cochera",
+  "Fondo de comercio",
   "Otro",
 ] as const;
 
