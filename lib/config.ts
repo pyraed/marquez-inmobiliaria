@@ -20,9 +20,9 @@ export const UBICACION_DISPLAY = "Adolfo Gonzales Chaves, Buenos Aires";
 // Horario
 export const HORARIO = "Lun a Sáb de 9 a 18hs";
 
-// Redes sociales — completar con las URLs reales
-export const INSTAGRAM_URL = ""; // Ej: "https://instagram.com/marquezinmobiliaria"
-export const FACEBOOK_URL = "";  // Ej: "https://facebook.com/marquezinmobiliaria"
+// Redes sociales
+export const INSTAGRAM_URL = "https://www.instagram.com/marquez_negociosinmobiliarios/";
+export const FACEBOOK_URL = "";
 
 // Dominio — actualizar cuando esté definido
 export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://marquezinmobiliaria.com.ar";
