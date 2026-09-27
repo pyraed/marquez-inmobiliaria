@@ -8,9 +8,10 @@ interface Props {
   titulo: string;
   ubicacion: string;
   precioDisplay: string;
+  url: string;
 }
 
-export default function PropiedadContactForm({ titulo, ubicacion, precioDisplay }: Props) {
+export default function PropiedadContactForm({ titulo, ubicacion, precioDisplay, url }: Props) {
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [mensaje, setMensaje] = useState(
@@ -22,7 +23,7 @@ export default function PropiedadContactForm({ titulo, ubicacion, precioDisplay 
     e.preventDefault();
     if (!nombre.trim() || !telefono.trim()) return;
     const texto = encodeURIComponent(
-      `Hola ${NOMBRE_AGENTE}, mi nombre es ${nombre.trim()}. Mi teléfono es ${telefono.trim()}. ${mensaje.trim()}`
+      `Hola ${NOMBRE_AGENTE}, mi nombre es ${nombre.trim()}. Mi teléfono es ${telefono.trim()}. ${mensaje.trim()}\n\n${url}`
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${texto}`, "_blank");
     setEnviado(true);

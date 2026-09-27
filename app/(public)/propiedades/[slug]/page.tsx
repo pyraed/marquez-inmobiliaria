@@ -336,6 +336,7 @@ function PanelContacto({
         titulo={titulo}
         ubicacion={ubicacion}
         precioDisplay={precioDisplay}
+        url={url}
       />
 
       <p className="text-white/30 text-xs mt-4 text-center">{HORARIO}</p>
