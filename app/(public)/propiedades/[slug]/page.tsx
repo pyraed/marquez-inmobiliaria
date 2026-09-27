@@ -7,7 +7,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import type { Propiedad, PropiedadCard as PropiedadCardType } from "../../../../types/propiedad";
 import {
-  FaWhatsapp, FaPhone, FaMapMarkerAlt, FaRulerCombined,
+  FaPhone, FaMapMarkerAlt, FaRulerCombined,
   FaDoorOpen, FaBath, FaCar, FaBed, FaArrowLeft, FaHandshake,
 } from "react-icons/fa";
 import {
@@ -84,7 +84,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
 
   const relacionadas = (relacionadasData as unknown as PropiedadCardType[]) || [];
 
-  // Características disponibles
   const caracteristicas = [
     propiedad.superficie_m2 && {
       icon: <FaRulerCombined />,
@@ -138,7 +137,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
     },
   ].filter(Boolean) as { icon: React.ReactNode; label: string; valor: string | number }[];
 
-  // Schema.org para esta propiedad
   const schemaPropiedad = {
     "@context": "https://schema.org",
     "@type": "RealEstateListing",
@@ -194,10 +192,8 @@ export default async function PropiedadDetallePage({ params }: Props) {
             {/* COLUMNA IZQUIERDA */}
             <div className="min-w-0">
 
-              {/* GALERÍA */}
               <Galeria imagenes={propiedad.imagenes} titulo={propiedad.titulo} />
 
-              {/* INFO */}
               <div className="mt-8">
                 <div className="flex flex-wrap gap-2 items-center mb-4">
                   <span className={`text-xs px-3 py-1 rounded-full font-semibold ${colorOperacion}`}>
@@ -220,7 +216,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
                 <h1 className="text-2xl md:text-3xl font-bold leading-tight">{propiedad.titulo}</h1>
                 <p className="text-orange-400 text-3xl font-bold mt-4">{propiedad.precio_display}</p>
 
-                {/* CARACTERÍSTICAS */}
                 {caracteristicas.length > 0 && (
                   <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
                     {caracteristicas.map((c) => (
@@ -236,7 +231,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
                   </div>
                 )}
 
-                {/* DESCRIPCIÓN */}
                 <div className="mt-6 bg-[#102A4C] rounded-2xl p-6 border border-white/10">
                   <h2 className="text-lg font-semibold mb-4">Descripción</h2>
                   <div className="text-white/75 leading-relaxed whitespace-pre-line text-sm">
@@ -255,7 +249,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
                 </div>
               </div>
 
-              {/* PROPIEDADES RELACIONADAS */}
               {relacionadas.length > 0 && (
                 <div className="mt-12">
                   <h2 className="text-xl font-bold mb-6">
@@ -269,7 +262,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
                 </div>
               )}
 
-              {/* VOLVER */}
               <div className="mt-10">
                 <Link
                   href="/propiedades"
@@ -300,7 +292,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
   );
 }
 
-// Panel de contacto — un solo flujo de WhatsApp a través del formulario
 function PanelContacto({
   titulo,
   ubicacion,
@@ -321,21 +312,26 @@ function PanelContacto({
         Contactate con {NOMBRE_AGENTE} directamente o dejá tu consulta.
       </p>
 
-      {/* Teléfono y compartir */}
+      {/* Teléfono y compartir — mismo estilo que /contacto */}
       <div className="flex flex-col gap-3 mb-5">
         <a
           href={PHONE_HREF}
-          className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-3 rounded-xl font-semibold transition text-sm"
+          className="flex items-center gap-4 group"
         >
-          <FaPhone size={14} />
-          {PHONE_NUMBER}
+          <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center shrink-0 group-hover:bg-orange-500/40 transition">
+            <FaPhone className="text-orange-400" size={15} />
+          </div>
+          <div>
+            <p className="text-sm font-semibold group-hover:text-orange-400 transition">{PHONE_NUMBER}</p>
+            <p className="text-white/50 text-xs">Llamadas</p>
+          </div>
         </a>
+
         <ShareButton titulo={titulo} url={url} />
       </div>
 
       <div className="h-px bg-white/10 mb-5" />
 
-      {/* Formulario — único punto de contacto por WhatsApp */}
       <PropiedadContactForm
         titulo={titulo}
         ubicacion={ubicacion}
