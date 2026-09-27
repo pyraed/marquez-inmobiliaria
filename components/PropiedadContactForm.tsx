@@ -15,7 +15,7 @@ export default function PropiedadContactForm({ titulo, ubicacion, precioDisplay,
   const [nombre, setNombre] = useState("");
   const [telefono, setTelefono] = useState("");
   const [mensaje, setMensaje] = useState(
-    `Hola ${NOMBRE_AGENTE}, me interesa la propiedad "${titulo}" en ${ubicacion}${precioDisplay ? ` (${precioDisplay})` : ""}. Por favor contácteme.`
+    `Me interesa la propiedad "${titulo}" en ${ubicacion}${precioDisplay ? ` (${precioDisplay})` : ""}. Por favor contácteme.`
   );
   const [enviado, setEnviado] = useState(false);
 
