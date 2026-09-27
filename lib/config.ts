@@ -15,7 +15,7 @@ export const PHONE_HREF = "tel:+5492983340336";
 // Ubicación
 export const LOCALIDAD_PRINCIPAL = "Adolfo Gonzales Chaves";
 export const PROVINCIA = "Buenos Aires";
-export const UBICACION_DISPLAY = "Adolfo Gonzales Chaves, Buenos Aires";
+export const UBICACION_DISPLAY = "Adolfo Gonzales Chaves y la zona, Buenos Aires";
 
 // Horario
 export const HORARIO = "Lun a Sáb de 9 a 18hs";
@@ -25,7 +25,7 @@ export const INSTAGRAM_URL = "https://www.instagram.com/marquez_negociosinmobili
 export const FACEBOOK_URL = "";
 
 // Dominio — actualizar cuando esté definido
-export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://marquezinmobiliaria.com.ar";
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://marquez-inmobiliaria.vercel.app";
 
 // SEO
 export const SEO_TITLE_DEFAULT = `${NOMBRE_INMOBILIARIA} | Propiedades en ${LOCALIDAD_PRINCIPAL}`;

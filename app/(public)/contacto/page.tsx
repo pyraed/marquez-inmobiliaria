@@ -76,7 +76,7 @@ export default function ContactoPage() {
                   </div>
                   <div>
                     <p className="text-sm font-semibold">{UBICACION_DISPLAY}</p>
-                    <p className="text-white/50 text-xs">Zona de cobertura</p>
+                    <p className="text-white/50 text-xs">Sede en Chaves · operamos en toda la zona</p>
                   </div>
                 </div>
 
