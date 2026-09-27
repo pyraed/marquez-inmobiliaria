@@ -76,32 +76,34 @@ export default function PropiedadCard({ propiedad, prioridad = false }: Props) {
           <span className="truncate">{ubicacion}</span>
         </p>
 
-        {/* CARACTERÍSTICAS */}
-        {(dormitorios || banos || superficie_m2 || ambientes) && (
-          <div className="flex gap-3 mt-3 text-white/50 text-xs">
-            {dormitorios && (
-              <span className="flex items-center gap-1">
-                <FaBed size={10} />
-                {dormitorios} dorm.
-              </span>
-            )}
-            {banos && (
-              <span className="flex items-center gap-1">
-                <FaBath size={10} />
-                {banos} baño{banos > 1 ? "s" : ""}
-              </span>
-            )}
-            {superficie_m2 && (
-              <span className="flex items-center gap-1">
-                <FaRulerCombined size={10} />
-                {superficie_m2} m²
-              </span>
-            )}
-            {!dormitorios && !banos && !superficie_m2 && ambientes && (
-              <span>{ambientes} amb.</span>
-            )}
-          </div>
-        )}
+        {/* CARACTERÍSTICAS — altura fija para alinear el precio entre cards */}
+        <div className="h-6 mt-3">
+          {(dormitorios || banos || superficie_m2 || ambientes) && (
+            <div className="flex gap-3 text-white/50 text-xs">
+              {dormitorios && (
+                <span className="flex items-center gap-1">
+                  <FaBed size={10} />
+                  {dormitorios} dorm.
+                </span>
+              )}
+              {banos && (
+                <span className="flex items-center gap-1">
+                  <FaBath size={10} />
+                  {banos} baño{banos > 1 ? "s" : ""}
+                </span>
+              )}
+              {superficie_m2 && (
+                <span className="flex items-center gap-1">
+                  <FaRulerCombined size={10} />
+                  {superficie_m2} m²
+                </span>
+              )}
+              {!dormitorios && !banos && !superficie_m2 && ambientes && (
+                <span>{ambientes} amb.</span>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="mt-auto pt-4">
           <p className="text-orange-400 font-bold text-xl">{precio_display}</p>
