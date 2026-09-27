@@ -16,7 +16,6 @@ export const revalidate = 60;
 export default async function Home() {
   const supabase = createPublicClient();
 
-  // Propiedades destacadas (marcadas como destacada=true) o las más recientes
   const { data: destacadasData } = await supabase
     .from("propiedades")
     .select("id, slug, titulo, operacion, tipo, precio_display, ubicacion, localidad, imagenes, dormitorios, banos, superficie_m2, ambientes")
@@ -25,7 +24,6 @@ export default async function Home() {
     .order("created_at", { ascending: false })
     .limit(3);
 
-  // Si no hay destacadas, traer las 3 más recientes
   let propiedades: PropiedadCardType[] = [];
   if (destacadasData && destacadasData.length > 0) {
     propiedades = destacadasData as unknown as PropiedadCardType[];
@@ -113,7 +111,6 @@ export default async function Home() {
           </ScrollReveal>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce z-10">
           <div className="w-6 h-10 border-2 border-white/30 rounded-full flex items-start justify-center pt-2">
             <div className="w-1 h-2 bg-white/60 rounded-full" />
@@ -286,15 +283,15 @@ export default async function Home() {
               ¿Querés vender o alquilar tu propiedad?
             </h2>
             <p className="text-white/60 mb-8 max-w-xl mx-auto">
-              Te hacemos una tasación gratuita y te asesoramos sobre el mejor camino
-              para que tu propiedad se destaque en el mercado.
+              Te asesoramos sobre el mejor camino para que tu propiedad
+              se destaque en el mercado.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/tasaciones"
                 className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-8 py-3.5 rounded-full font-semibold transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-orange-500/30"
               >
-                Solicitar tasación gratuita
+                Solicitar tasación
               </Link>
               <a
                 href={WHATSAPP_URL}
@@ -333,18 +330,6 @@ export default async function Home() {
                 </p>
               </div>
               <div className="flex flex-col gap-3">
-                <a
-                  href={WHATSAPP_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-orange-500/30 px-5 py-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5"
-                >
-                  <FaWhatsapp className="text-orange-400 shrink-0" size={20} />
-                  <div>
-                    <p className="text-sm font-semibold">WhatsApp</p>
-                    <p className="text-white/50 text-xs">Respuesta inmediata</p>
-                  </div>
-                </a>
                 <a
                   href={PHONE_HREF}
                   className="flex items-center gap-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-orange-500/30 px-5 py-4 rounded-xl transition-all duration-200 hover:-translate-y-0.5"

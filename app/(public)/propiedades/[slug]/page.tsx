@@ -11,7 +11,7 @@ import {
   FaDoorOpen, FaBath, FaCar, FaBed, FaArrowLeft, FaHandshake,
 } from "react-icons/fa";
 import {
-  WHATSAPP_NUMBER, PHONE_HREF, PHONE_NUMBER,
+  PHONE_HREF, PHONE_NUMBER,
   NOMBRE_AGENTE, SITE_URL, HORARIO,
 } from "../../../../lib/config";
 import { notFound } from "next/navigation";
@@ -83,10 +83,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
     .limit(3);
 
   const relacionadas = (relacionadasData as unknown as PropiedadCardType[]) || [];
-
-  const mensajeWhatsapp = encodeURIComponent(
-    `Hola ${NOMBRE_AGENTE}, me interesa la propiedad "${propiedad.titulo}" en ${propiedad.ubicacion}${propiedad.precio_display ? ` (${propiedad.precio_display})` : ""}. ¿Podemos hablar?`
-  );
 
   // Características disponibles
   const caracteristicas = [
@@ -248,10 +244,9 @@ export default async function PropiedadDetallePage({ params }: Props) {
                   </div>
                 </div>
 
-                {/* CONTACTO MOBILE — visible solo en mobile, debajo de la descripción */}
+                {/* CONTACTO MOBILE */}
                 <div className="lg:hidden mt-6">
                   <PanelContacto
-                    mensajeWhatsapp={mensajeWhatsapp}
                     titulo={propiedad.titulo}
                     ubicacion={propiedad.ubicacion}
                     precioDisplay={propiedad.precio_display}
@@ -290,7 +285,6 @@ export default async function PropiedadDetallePage({ params }: Props) {
             <div className="hidden lg:block">
               <div className="sticky top-28">
                 <PanelContacto
-                  mensajeWhatsapp={mensajeWhatsapp}
                   titulo={propiedad.titulo}
                   ubicacion={propiedad.ubicacion}
                   precioDisplay={propiedad.precio_display}
@@ -306,15 +300,13 @@ export default async function PropiedadDetallePage({ params }: Props) {
   );
 }
 
-// Panel de contacto reutilizable (mobile y desktop)
+// Panel de contacto — un solo flujo de WhatsApp a través del formulario
 function PanelContacto({
-  mensajeWhatsapp,
   titulo,
   ubicacion,
   precioDisplay,
   slug,
 }: {
-  mensajeWhatsapp: string;
   titulo: string;
   ubicacion: string;
   precioDisplay: string;
@@ -329,16 +321,8 @@ function PanelContacto({
         Contactate con {NOMBRE_AGENTE} directamente o dejá tu consulta.
       </p>
 
+      {/* Teléfono y compartir */}
       <div className="flex flex-col gap-3 mb-5">
-        <a
-          href={`https://wa.me/${WHATSAPP_NUMBER}?text=${mensajeWhatsapp}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-5 py-3 rounded-xl font-semibold transition text-sm"
-        >
-          <FaWhatsapp size={17} />
-          Consultar por WhatsApp
-        </a>
         <a
           href={PHONE_HREF}
           className="flex items-center justify-center gap-2 bg-white/10 hover:bg-white/20 border border-white/20 px-5 py-3 rounded-xl font-semibold transition text-sm"
@@ -351,6 +335,7 @@ function PanelContacto({
 
       <div className="h-px bg-white/10 mb-5" />
 
+      {/* Formulario — único punto de contacto por WhatsApp */}
       <PropiedadContactForm
         titulo={titulo}
         ubicacion={ubicacion}
