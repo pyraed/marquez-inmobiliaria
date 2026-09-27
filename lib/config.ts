@@ -13,9 +13,9 @@ export const PHONE_NUMBER = "+54 9 298 334 0336";
 export const PHONE_HREF = "tel:+5492983340336";
 
 // Ubicación
-export const LOCALIDAD_PRINCIPAL = "Adolfo Gonzalez Chaves";
+export const LOCALIDAD_PRINCIPAL = "Adolfo Gonzales Chaves";
 export const PROVINCIA = "Buenos Aires";
-export const UBICACION_DISPLAY = "Adolfo Gonzalez Chaves, Buenos Aires";
+export const UBICACION_DISPLAY = "Adolfo Gonzales Chaves, Buenos Aires";
 
 // Horario
 export const HORARIO = "Lun a Sáb de 9 a 18hs";
