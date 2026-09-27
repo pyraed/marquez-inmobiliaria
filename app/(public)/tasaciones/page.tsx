@@ -8,7 +8,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Tasaciones — Vendé o alquilá tu propiedad",
-  description: `¿Querés vender o alquilar tu propiedad en ${LOCALIDAD_PRINCIPAL}? ${NOMBRE_INMOBILIARIA} te ofrece tasación gratuita y asesoramiento personalizado.`,
+  description: `¿Querés vender o alquilar tu propiedad en ${LOCALIDAD_PRINCIPAL}? ${NOMBRE_INMOBILIARIA} te ofrece tasación profesional y asesoramiento personalizado.`,
 };
 
 const pasos = [
@@ -19,7 +19,7 @@ const pasos = [
   },
   {
     numero: "02",
-    titulo: "Tasación gratuita",
+    titulo: "Tasación profesional",
     descripcion: `${NOMBRE_AGENTE} evalúa tu propiedad y te da un valor de mercado real y actualizado.`,
   },
   {
@@ -35,8 +35,8 @@ const pasos = [
 ];
 
 const ventajas = [
-  "Tasación gratuita y sin compromiso",
-  "Asesoramiento personalizado en cada etapa",
+  "Tasación profesional y personalizada",
+  "Asesoramiento en cada etapa",
   "Publicación profesional con fotos de calidad",
   "Amplia red de potenciales compradores e inquilinos",
   "Gestión completa de documentación",
@@ -61,7 +61,7 @@ export default function TasacionesPage() {
           <br className="hidden sm:block" /> tu propiedad?
         </h1>
         <p className="text-white/60 text-lg mb-8 max-w-xl mx-auto">
-          Te hacemos una tasación gratuita y te asesoramos para que tu propiedad
+          Te asesoramos para que tu propiedad
           se venda o alquile rápido y al mejor precio.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -72,7 +72,7 @@ export default function TasacionesPage() {
             className="inline-flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 hover:shadow-xl hover:shadow-orange-500/30 hover:-translate-y-0.5"
           >
             <FaWhatsapp size={20} />
-            Solicitar tasación gratis
+            Solicitar tasación
           </a>
         </div>
       </section>
