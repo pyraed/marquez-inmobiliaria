@@ -22,7 +22,6 @@ export default function Footer() {
         {/* BRAND */}
         <div>
           <Link href="/" className="inline-block mb-5">
-            {/* Logo footer: más grande que el header para mayor presencia */}
             <Image
               src="/logo-marquez.png"
               alt="MarQuez Negocios Inmobiliarios"
@@ -35,33 +34,39 @@ export default function Footer() {
             Asesoramiento inmobiliario personalizado en compra, venta y alquiler
             de propiedades en {UBICACION_DISPLAY}.
           </p>
-          <div className="flex gap-3">
-            {INSTAGRAM_URL && (
-              <a
-                href={INSTAGRAM_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Instagram de MarQuez"
-                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-orange-500/20 hover:text-orange-400 flex items-center justify-center transition-all duration-200"
-              >
-                <FaInstagram size={16} />
-              </a>
-            )}
-            {FACEBOOK_URL && (
-              <a
-                href={FACEBOOK_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Facebook de MarQuez"
-                className="w-9 h-9 rounded-lg bg-white/10 hover:bg-orange-500/20 hover:text-orange-400 flex items-center justify-center transition-all duration-200"
-              >
-                <FaFacebook size={16} />
-              </a>
-            )}
-            {!INSTAGRAM_URL && !FACEBOOK_URL && (
-              <p className="text-white/30 text-xs italic">Redes sociales próximamente</p>
-            )}
-          </div>
+
+          {/* REDES SOCIALES */}
+          {(INSTAGRAM_URL || FACEBOOK_URL) && (
+            <div>
+              <p className="text-white/90 text-sm font-semibold mb-3">Redes sociales</p>
+              <div className="flex gap-3">
+                {INSTAGRAM_URL && (
+                  <a
+                    href={INSTAGRAM_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Instagram de MarQuez"
+                    className="flex items-center gap-2 bg-white/10 hover:bg-orange-500/20 hover:text-orange-400 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                  >
+                    <FaInstagram size={15} />
+                    Instagram
+                  </a>
+                )}
+                {FACEBOOK_URL && (
+                  <a
+                    href={FACEBOOK_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Facebook de MarQuez"
+                    className="flex items-center gap-2 bg-white/10 hover:bg-orange-500/20 hover:text-orange-400 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200"
+                  >
+                    <FaFacebook size={15} />
+                    Facebook
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* NAVEGACIÓN */}
